@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<link rel="manifest" href="manifest.json">
+    <title>Isometrix2 - Entrenamiento</title>
+    <style>
+		html { font-size: 18px; }
+        body { font-family: sans-serif;
+            background-color: #121212;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column; }
+        .selector-dia { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .btn-dia { padding: 12px 20px; border-radius: 12px; border: none; cursor: pointer; color: white; font-weight: bold; }
+        #btn-dia1 { background-color: #3498db; }
+        #btn-dia2 { background-color: #e67e22; }
+        #btn-dia3 { background-color: #27ae60; }
+
+        .ejercicio-card {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 10px auto;
+            width: 100%;
+            max-width: 600px;
+        }
+        .cronometro { font-size: 3.5rem; font-weight: 900; margin: 15px 0; }
+
+		.btn-principal {
+			display: block;
+			width: 80%;
+			max-width: 300px;
+			margin: 20px auto;
+			padding: 15px;
+			border-radius: 50px;
+			border: none;
+			background-color: #2ecc71;
+			color: white;
+			font-weight: bold;
+			cursor: pointer;
+		}
+
+		/* Botones de navegación (Anterior / Siguiente) */
+		.fila-navegacion {
+			display: none;
+			justify-content: space-between;
+			gap: 10px;
+			margin: 15px auto 0;
+			max-width: 300px;
+		}
+		.btn-nav {
+			flex: 1;
+			padding: 12px 10px;
+			border-radius: 50px;
+			border: none;
+			background-color: #333;
+			color: white;
+			font-weight: bold;
+			cursor: pointer;
+			font-size: 0.95rem;
+		}
+		.btn-nav:disabled { opacity: 0.35; cursor: not-allowed; }
+
+		.contenedor-img-ej {
+            width: 100%;
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+            overflow: hidden;
+            background: #1a1a1a;
+            border-radius: 15px;
+        }
+		#ui-imagen-ejercicio { width: 100%; height: 100%; object-fit: contain; display: none; }
+
+		/* Botón de Ajustes (Arriba a la derecha) */
+        .btn-config {
+			position: fixed;
+			top: 15px;
+			right: 15px;
+			z-index: 9999;
+			background: rgba(0,0,0,0.5);
+			border: none;
+			cursor: pointer;
+			font-size: 1.6rem;
+		}
+
+        .input-tiempo {
+			width: 50px;
+			padding: 6px 4px;
+			background-color: #333;
+			border: 1px solid #555;
+			color: white;
+			border-radius: 5px;
+			text-align: center;
+			font-size: 1rem;
+			font-weight: bold;
+		}
+		.input-peso { width: 64px; }
+
+		/* ---------- Pantalla de ajustes ---------- */
+        #pantalla-ajustes {
+			display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+			background-color: #121212; z-index: 10000; padding: 20px 16px;
+			overflow-y: auto; text-align: left; box-sizing: border-box;
+		}
+		#pantalla-ajustes h2 { margin: 0 0 10px; }
+		.tabs { display: flex; gap: 8px; margin: 10px 0 16px; }
+		.tab { flex: 1; padding: 10px 6px; border-radius: 10px; border: none; background: #2a2a2a; color: #ccc; font-weight: bold; font-size: 0.85rem; cursor: pointer; }
+		.tab.activa { background: #fff; color: #121212; }
+		.pills { display: flex; gap: 8px; margin-bottom: 12px; }
+		.pill { flex: 1; padding: 10px; border-radius: 10px; border: 2px solid transparent; color: white; font-weight: bold; opacity: 0.5; cursor: pointer; }
+		.pill.activa { opacity: 1; border-color: white; }
+		.nota { color: #888; font-size: 0.75rem; margin: 0 0 12px; }
+
+		.rut-fila { background: #1a1a1a; border-radius: 12px; padding: 10px; margin-bottom: 10px; }
+		.rut-sup { display: flex; align-items: center; gap: 10px; }
+		.mini { width: 52px; height: 52px; object-fit: contain; background: #111; border-radius: 8px; flex-shrink: 0; }
+		.rut-nombre { flex: 1; font-weight: bold; font-size: 0.9rem; }
+		.rut-nombre small { display: block; color: #888; font-weight: normal; font-size: 0.75rem; margin-top: 2px; }
+		.rut-ctrl { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+		.rut-ctrl label { font-size: 0.7rem; color: #999; display: flex; align-items: center; gap: 4px; }
+		.espacio { flex: 1; }
+		.btn-ico { width: 36px; height: 36px; border-radius: 8px; border: none; background: #333; color: white; font-size: 1rem; cursor: pointer; }
+		.btn-ico:disabled { opacity: 0.25; cursor: not-allowed; }
+		.btn-sec { display: block; width: 100%; padding: 13px; border-radius: 12px; border: 1px dashed #666; background: transparent; color: white; font-weight: bold; margin: 8px 0; cursor: pointer; }
+		.btn-peligro { border-color: #c0392b; color: #e74c3c; }
+		.vacio { color: #888; text-align: center; padding: 20px 0; }
+
+		.fila-lib { display: flex; align-items: center; gap: 10px; background: #1a1a1a; padding: 8px 10px; margin-bottom: 8px; border-radius: 10px; }
+		.fila-lib .nombre { flex: 1; font-size: 0.9rem; }
+		.fila-lib .unidad { font-size: 0.75rem; color: #888; width: 78px; }
+
+		/* ---------- Selector de ejercicios ---------- */
+		#selector-ejercicios {
+			display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+			z-index: 10001; background: #121212; padding: 16px; overflow-y: auto;
+			box-sizing: border-box; text-align: left;
+		}
+		#selector-ejercicios h2 { margin: 0 0 10px; }
+		#sel-buscar { width: 100%; box-sizing: border-box; padding: 11px; border-radius: 10px; border: 1px solid #555; background: #222; color: white; font-size: 1rem; }
+		.chips { display: flex; gap: 8px; margin: 10px 0; }
+		.chip { padding: 8px 14px; border-radius: 20px; border: none; background: #2a2a2a; color: #ccc; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+		.chip.activa { background: #fff; color: #121212; }
+		.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 12px 0; }
+		.card-ej { background: #1e1e1e; border: none; border-radius: 12px; padding: 8px; color: white; text-align: center; font-size: 0.8rem; cursor: pointer; }
+		.card-ej img { width: 100%; height: 100px; object-fit: contain; background: #111; border-radius: 8px; margin-bottom: 6px; }
+		.card-ej em { display: block; color: #2ecc71; font-size: 0.7rem; font-style: normal; margin-top: 2px; }
+	</style>
+</head>
+<body>
+   <button class="btn-config" onclick="abrirAjustes()">⚙️</button>
+
+    <header id="cabecera">
+        <h1>Isometrix2</h1>
+		<h2 id="ui-nombre">Selecciona un día</h2>
+        <div id="contenedor-selector" class="selector-dia">
+            <button id="btn-dia1" class="btn-dia" onclick="cargarDia('dia1')">Día 1</button>
+            <button id="btn-dia2" class="btn-dia" onclick="cargarDia('dia2')">Día 2</button>
+            <button id="btn-dia3" class="btn-dia" onclick="cargarDia('dia3')">Día 3</button>
+        </div>
+		<img id="ui-logo" src="Isometrix.png" style="width:200px; margin-top:15px;">
+    </header>
+
+    <div class="ejercicio-card">
+        <div class="contenedor-img-ej">
+            <img id="ui-imagen-ejercicio" src="">
+        </div>
+
+		<div id="ui-timer" class="cronometro" style="display: none;">00:00</div>
+        <p id="ui-info" style="font-weight: bold;"></p>
+
+        <button id="btn-control" class="btn-principal" onclick="manejarAccion()" style="display: none;">EMPEZAR</button>
+
+        <div id="fila-navegacion" class="fila-navegacion">
+            <button id="btn-anterior" class="btn-nav" onclick="irAnterior()">⬅ Anterior</button>
+            <button id="btn-siguiente" class="btn-nav" onclick="irSiguiente()">Siguiente ➡</button>
+        </div>
+    </div>
+
+	<!-- Ajustes: rutinas / tiempos / copia -->
+	<div id="pantalla-ajustes">
+		<h2>Ajustes</h2>
+		<div class="tabs">
+			<button class="tab" data-tab="rutinas" onclick="irTab('rutinas')">Rutinas</button>
+			<button class="tab" data-tab="tiempos" onclick="irTab('tiempos')">Tiempos</button>
+			<button class="tab" data-tab="copia" onclick="irTab('copia')">Copia</button>
+		</div>
+		<div id="aj-contenido"></div>
+		<button class="btn-principal" onclick="cerrarAjustes()">VOLVER</button>
+	</div>
+
+	<!-- Selector de ejercicios (rejilla con imágenes) -->
+	<div id="selector-ejercicios">
+		<h2 id="sel-titulo">Elegir ejercicio</h2>
+		<input id="sel-buscar" type="search" placeholder="Buscar ejercicio..." oninput="pintarSelector()">
+		<div class="chips">
+			<button class="chip" data-f="todos" onclick="filtrarSelector('todos')">Todos</button>
+			<button class="chip" data-f="iso" onclick="filtrarSelector('iso')">Isométricos</button>
+			<button class="chip" data-f="fuerza" onclick="filtrarSelector('fuerza')">Fuerza</button>
+		</div>
+		<div id="sel-grid" class="grid"></div>
+		<button class="btn-principal" style="background:#444" onclick="cerrarSelector()">CANCELAR</button>
+	</div>
+
+    <script>
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.register('sw.js')
+				.then(reg => console.log('Service Worker registrado', reg))
+				.catch(err => console.error('Error en Service Worker', err));
+		}
+
+		// --- Wake Lock: mantiene la pantalla encendida mientras se usa la app ---
+		let wakeLock = null;
+
+		async function solicitarWakeLock() {
+			if (!('wakeLock' in navigator)) return;
+			try {
+				wakeLock = await navigator.wakeLock.request('screen');
+				wakeLock.addEventListener('release', () => {
+					wakeLock = null;
+					console.log('Wake Lock liberado');
+				});
+			} catch (err) {
+				console.error('No se pudo activar Wake Lock:', err);
+			}
+		}
+		document.addEventListener('visibilitychange', () => {
+			if (wakeLock === null && document.visibilityState === 'visible') solicitarWakeLock();
+		});
+		solicitarWakeLock();
+		document.addEventListener('click', () => {
+			if (wakeLock === null) solicitarWakeLock();
+		}, { once: true });
+
+		/* =====================================================================
+		   BIBLIOTECA FIJA DE EJERCICIOS
+		   Cada ejercicio se define una sola vez. 'valor' es el tiempo (iso) o las
+		   repeticiones (fuerza) por defecto, y es el mismo en todos los días.
+		   'unilateral': al hacer N series se alternan dcha/izda (N por lado).
+		   ===================================================================== */
+		const BIBLIOTECA = [
+			{ id: 'mov_hombro',     nombre: 'Movilidad hombros',     tipo: 'iso',    valor: 30, img: 'mov_hombro.png' },
+			{ id: 'mov_espalda',    nombre: 'Movilidad espalda',     tipo: 'iso',    valor: 45, img: 'mov_espalda.png' },
+			{ id: 'cadera',         nombre: 'Rotaciones cadera',     tipo: 'iso',    valor: 30, img: 'cadera.png' },
+			{ id: 'sentadilla_sin', nombre: 'Sentadilla sin peso',   tipo: 'iso',    valor: 30, img: 'sentadilla_sin.png' },
+			{ id: 'buenos_dias',    nombre: 'Buenos días',           tipo: 'iso',    valor: 45, img: 'Buenos_dias.png' },
+			{ id: 'bird_dog',       nombre: 'Bird dog',              tipo: 'iso',    valor: 45, img: 'bird_dog.png' },
+			{ id: 'esfinge',        nombre: 'Esfinge',               tipo: 'iso',    valor: 30, img: 'esfinge.jpg' },
+			{ id: 'puente',         nombre: 'Puente Glúteo Iso',     tipo: 'iso',    valor: 60, img: 'puente.png' },
+			{ id: 'plancha',        nombre: 'Plancha Abdominal',     tipo: 'iso',    valor: 60, img: 'plancha.jpg' },
+			{ id: 'plancha_lat',    nombre: 'Plancha lateral',       tipo: 'iso',    valor: 45, img: 'plancha_lat.jpg', unilateral: true },
+			{ id: 'zancada',        nombre: 'Zancadas',              tipo: 'iso',    valor: 45, img: 'zancada.png',     unilateral: true },
+			{ id: 'sentadilla',     nombre: 'Sentadilla Isométrica', tipo: 'iso',    valor: 45, img: 'sentadilla.jpg' },
+			{ id: 'flexion',        nombre: 'Flexión isométrica',    tipo: 'iso',    valor: 45, img: 'flexion.jpg' },
+			{ id: 'hollow',         nombre: 'Hollow Hold',           tipo: 'iso',    valor: 45, img: 'hollow.png' },
+			{ id: 'farmer',         nombre: 'Farmer Carry estático', tipo: 'iso',    valor: 45, img: 'farmer.png' },
+			{ id: 'goblet',         nombre: 'Sentadilla Goblet',     tipo: 'fuerza', valor: 12, peso: '20kg', img: 'goblet.png' },
+			{ id: 'press_pecho',    nombre: 'Press Pecho',           tipo: 'fuerza', valor: 12, peso: '20kg', img: 'Press.png' },
+			{ id: 'peso_muerto',    nombre: 'Peso Muerto Rumano',    tipo: 'fuerza', valor: 12, peso: '25kg', img: 'peso_muerto.png' },
+			{ id: 'hombro',         nombre: 'Press Militar',         tipo: 'fuerza', valor: 10, peso: '20kg', img: 'hombro.png' },
+			{ id: 'remo',           nombre: 'Remo una mano',         tipo: 'fuerza', valor: 12, peso: '15kg', img: 'remo.png' },
+			{ id: 'pajaro',         nombre: 'Pájaros mancuernas',    tipo: 'fuerza', valor: 12, peso: '15kg', img: 'pajaro.png' },
+			{ id: 'step_down',      nombre: 'Step-down controlado',  tipo: 'fuerza', valor: 12, peso: '0',    img: 'step-down.png' }
+		];
+		const EJ = {};
+		BIBLIOTECA.forEach(b => EJ[b.id] = b);
+
+		const DIAS = ['dia1', 'dia2', 'dia3'];
+		const NOMBRES = { dia1: 'Día 1', dia2: 'Día 2', dia3: 'Día 3' };
+		const COLORES = { dia1: '#3498db', dia2: '#e67e22', dia3: '#27ae60' };
+
+		/* =====================================================================
+		   ESTADO (guardado en localStorage)
+		   estado.tiempos[idEjercicio] = segundos o reps (común a todos los días)
+		   estado.rutinas[dia] = [ { id, series, peso? }, ... ]  (en orden)
+		   ===================================================================== */
+		function rutinasPorDefecto() {
+			const it = (id, series = 1, peso) => {
+				const o = { id, series };
+				if (peso !== undefined) o.peso = peso;
+				return o;
+			};
+			return {
+				dia1: [
+					it('mov_hombro'), it('sentadilla_sin'),
+					it('puente'), it('plancha'), it('puente'), it('plancha'),
+					it('cadera'),
+					it('goblet'), it('press_pecho'), it('peso_muerto'),
+					it('zancada', 2),
+					it('hombro'),
+					it('sentadilla', 2), it('plancha_lat', 2), it('hollow', 2), it('farmer', 2)
+				],
+				dia2: [
+					it('mov_espalda'), it('buenos_dias'), it('bird_dog'),
+					it('plancha_lat', 1),
+					it('peso_muerto'), it('remo'),
+					it('zancada', 2),
+					it('pajaro'), it('hombro', 1, '12kg'),
+					it('sentadilla', 2), it('plancha', 2), it('flexion', 2), it('farmer', 2)
+				],
+				dia3: [
+					it('mov_hombro'), it('sentadilla_sin'), it('buenos_dias'), it('esfinge'),
+					it('flexion', 2), it('puente'), it('plancha', 2),
+					it('goblet'), it('hombro'), it('remo'), it('press_pecho'), it('peso_muerto'),
+					it('puente', 2), it('sentadilla', 2),
+					it('step_down'), it('farmer', 2)
+				]
+			};
+		}
+
+		function estadoPorDefecto() {
+			const tiempos = {};
+			BIBLIOTECA.forEach(b => tiempos[b.id] = b.valor);
+			return { tiempos, rutinas: rutinasPorDefecto() };
+		}
+
+		// Valida/limpia un estado (propio o importado) y rellena lo que falte
+		function sanear(e, def) {
+			const out = { tiempos: Object.assign({}, def.tiempos), rutinas: {} };
+			if (e && e.tiempos) {
+				BIBLIOTECA.forEach(b => {
+					const v = Math.round(Number(e.tiempos[b.id]));
+					if (v > 0 && v < 10000) out.tiempos[b.id] = v;
+				});
+			}
+			DIAS.forEach(d => {
+				const lista = (e && e.rutinas && Array.isArray(e.rutinas[d])) ? e.rutinas[d] : def.rutinas[d];
+				out.rutinas[d] = lista.filter(x => x && EJ[x.id]).map(x => {
+					const o = { id: x.id, series: Math.max(1, Math.min(20, parseInt(x.series) || 1)) };
+					if (typeof x.peso === 'string' && x.peso !== '') o.peso = x.peso;
+					return o;
+				});
+			});
+			return out;
+		}
+
+		// Recupera los tiempos/reps que tuvieras guardados con la versión anterior de la app
+		function migrarTiemposAntiguos(tiempos) {
+			try {
+				const viejo = JSON.parse(localStorage.getItem('rutinas'));
+				if (!viejo) return;
+				const porImg = {};
+				BIBLIOTECA.forEach(b => porImg[b.img] = b);
+				Object.values(viejo).forEach(lista => lista.forEach(ej => {
+					const b = porImg[ej.img];
+					if (!b) return;
+					const v = ej.tipo === 'fuerza' ? ej.reps : ej.tiempo;
+					if (Number.isFinite(v) && v > 0) tiempos[b.id] = v;
+				}));
+			} catch (_) {}
+		}
+
+		function cargarEstado() {
+			const def = estadoPorDefecto();
+			let guardado = null;
+			try { guardado = JSON.parse(localStorage.getItem('isx_v2')); } catch (_) {}
+			if (!guardado) {
+				migrarTiemposAntiguos(def.tiempos);
+				return def;
+			}
+			return sanear(guardado, def);
+		}
+
+		function guardar() {
+			localStorage.setItem('isx_v2', JSON.stringify(estado));
+		}
+
+		let estado = cargarEstado();
+		guardar();
+
+		function pesoDe(item) {
+			return item.peso !== undefined ? item.peso : EJ[item.id].peso;
+		}
+
+		/* =====================================================================
+		   ENTRENAMIENTO
+		   ===================================================================== */
+		let diaActual = null;
+		let ejercicioIdx = 0;
+		let intervalActual = null;
+		let plan = [];
+		let terminado = false;
+
+		// Convierte la rutina del día en la lista de pasos reales (series, lados...)
+		function construirPlan(dia) {
+			const pasos = [];
+			estado.rutinas[dia].forEach(item => {
+				const b = EJ[item.id];
+				const n = item.series;
+				const base = { id: b.id, peso: pesoDe(item), total: n };
+				for (let s = 1; s <= n; s++) {
+					if (b.unilateral) {
+						pasos.push(Object.assign({}, base, { lado: 'dcha', serie: s }));
+						pasos.push(Object.assign({}, base, { lado: 'izda', serie: s }));
+					} else {
+						pasos.push(Object.assign({}, base, { serie: s }));
+					}
+				}
+			});
+			return pasos;
+		}
+
+        function cargarDia(dia) {
+			const nuevoPlan = construirPlan(dia);
+			if (!nuevoPlan.length) {
+				alert('Esta rutina está vacía. Añade ejercicios desde ⚙️ › Rutinas.');
+				return;
+			}
+			plan = nuevoPlan;
+			diaActual = dia;
+			ejercicioIdx = 0;
+			terminado = false;
+
+			document.getElementById('contenedor-selector').style.display = 'none';
+			document.getElementById('ui-logo').style.display = 'none';
+			document.getElementById('ui-imagen-ejercicio').style.display = 'block';
+			document.getElementById('btn-control').style.display = 'block';
+			document.getElementById('fila-navegacion').style.display = 'flex';
+
+			renderizarEjercicio();
+		}
+
+		function renderizarEjercicio() {
+			if (intervalActual) {
+				clearInterval(intervalActual);
+				intervalActual = null;
+			}
+
+			const paso = plan[ejercicioIdx];
+			const b = EJ[paso.id];
+			const valor = estado.tiempos[b.id];
+
+			document.getElementById('ui-nombre').innerText = b.nombre + (paso.lado ? ' ' + paso.lado : '');
+			document.getElementById('ui-imagen-ejercicio').src = b.img;
+
+			let info = b.tipo === 'fuerza' ? `Peso: ${paso.peso} | Reps: ${valor}` : `Tiempo: ${valor}s`;
+			if (paso.total > 1) info += ` | Serie ${paso.serie}/${paso.total}`;
+			document.getElementById('ui-info').innerText = info;
+
+			if (b.tipo === 'iso') {
+				document.getElementById('ui-timer').style.display = 'block';
+				document.getElementById('ui-timer').innerText = valor;
+			} else {
+				document.getElementById('ui-timer').style.display = 'none';
+			}
+			document.getElementById('btn-control').style.display = 'block';
+			document.getElementById('btn-control').innerText = 'EMPEZAR';
+
+			document.getElementById('fila-navegacion').style.display = 'flex';
+			document.getElementById('btn-anterior').disabled = (ejercicioIdx === 0);
+			document.getElementById('btn-siguiente').innerText = (ejercicioIdx === plan.length - 1) ? 'Finalizar ➡' : 'Siguiente ➡';
+		}
+
+		function irAnterior() {
+			if (ejercicioIdx > 0) {
+				ejercicioIdx--;
+				renderizarEjercicio();
+			}
+		}
+
+		function irSiguiente() {
+			avanzar();
+		}
+
+		function manejarAccion() {
+			const paso = plan[ejercicioIdx];
+			const b = EJ[paso.id];
+
+			if (b.tipo === 'iso') {
+				document.getElementById('btn-control').style.display = 'none';
+				let t = estado.tiempos[b.id];
+				document.getElementById('ui-timer').innerText = t;
+
+				intervalActual = setInterval(() => {
+					t--;
+					document.getElementById('ui-timer').innerText = t;
+
+					if (t > 0 && t <= 5) {
+						emitirPitido();
+					}
+
+					if (t <= 0) {
+						clearInterval(intervalActual);
+						intervalActual = null;
+						avanzar();
+					}
+				}, 1000);
+			} else {
+				avanzar();
+			}
+		}
+
+		// Un único AudioContext reutilizado (crear uno por pitido acaba bloqueando el audio)
+		let audioCtx = null;
+		function emitirPitido() {
+			try {
+				if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+				if (audioCtx.state === 'suspended') audioCtx.resume();
+				const osc = audioCtx.createOscillator();
+				const gain = audioCtx.createGain();
+
+				osc.type = 'square';
+				osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+				gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+				gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+
+				osc.connect(gain);
+				gain.connect(audioCtx.destination);
+				osc.start();
+				osc.stop(audioCtx.currentTime + 0.5);
+			} catch (err) {
+				console.error('No se pudo emitir el pitido:', err);
+			}
+		}
+
+        function avanzar() {
+			if (intervalActual) {
+				clearInterval(intervalActual);
+				intervalActual = null;
+			}
+
+			ejercicioIdx++;
+			if (ejercicioIdx < plan.length) {
+				renderizarEjercicio();
+			} else {
+				terminado = true;
+				document.getElementById('ui-nombre').innerText = "¡Completado!";
+				document.getElementById('ui-imagen-ejercicio').src = "trofeo.png";
+				document.getElementById('ui-timer').style.display = 'none';
+				document.getElementById('ui-info').innerText = '';
+				document.getElementById('btn-control').innerText = "VOLVER AL INICIO";
+				document.getElementById('btn-control').style.display = 'block';
+				document.getElementById('btn-control').onclick = () => location.reload();
+				document.getElementById('fila-navegacion').style.display = 'none';
+			}
+		}
+
+		/* =====================================================================
+		   AJUSTES
+		   ===================================================================== */
+		// Pequeño helper para construir elementos sin tener que escapar HTML
+		function el(tag, attrs, ...hijos) {
+			const e = document.createElement(tag);
+			Object.entries(attrs || {}).forEach(([k, v]) => {
+				if (k === 'class') e.className = v;
+				else if (k === 'style') e.style.cssText = v;
+				else if (k.startsWith('on')) e[k] = v;
+				else if (v === true) e.setAttribute(k, '');
+				else if (v !== false && v != null) e.setAttribute(k, v);
+			});
+			hijos.flat().forEach(h => { if (h != null) e.append(h); });
+			return e;
+		}
+		function imgEj(b, clase) {
+			return el('img', { class: clase, src: b.img, onerror: function () { this.style.visibility = 'hidden'; } });
+		}
+
+		let ajusteTab = 'rutinas';
+		let ajusteDia = 'dia1';
+
+		function abrirAjustes() {
+			document.getElementById('pantalla-ajustes').style.display = 'block';
+			pintarAjustes();
+		}
+
+		function cerrarAjustes() {
+			document.getElementById('pantalla-ajustes').style.display = 'none';
+
+			// Si hay un entrenamiento en curso, lo reconstruimos con los cambios
+			if (diaActual && !terminado) {
+				plan = construirPlan(diaActual);
+				if (!plan.length) { location.reload(); return; }
+				ejercicioIdx = Math.min(ejercicioIdx, plan.length - 1);
+				renderizarEjercicio();
+			}
+		}
+
+		function irTab(t) {
+			ajusteTab = t;
+			pintarAjustes();
+		}
+
+		function pintarAjustes() {
+			document.querySelectorAll('.tab').forEach(b => {
+				b.classList.toggle('activa', b.dataset.tab === ajusteTab);
+			});
+			const cont = document.getElementById('aj-contenido');
+			cont.innerHTML = '';
+			if (ajusteTab === 'rutinas') pintarRutinas(cont);
+			else if (ajusteTab === 'tiempos') pintarTiempos(cont);
+			else pintarCopia(cont);
+		}
+
+		// ---------- Pestaña RUTINAS ----------
+		function pintarRutinas(cont) {
+			const pills = el('div', { class: 'pills' });
+			DIAS.forEach(d => {
+				pills.append(el('button', {
+					class: 'pill' + (d === ajusteDia ? ' activa' : ''),
+					style: `background:${COLORES[d]}`,
+					onclick: () => { ajusteDia = d; pintarAjustes(); }
+				}, NOMBRES[d]));
+			});
+			cont.append(pills);
+
+			const lista = estado.rutinas[ajusteDia];
+			const nPasos = construirPlan(ajusteDia).length;
+			cont.append(el('p', { class: 'nota' },
+				`${lista.length} ejercicios · ${nPasos} pasos en total. Las series de los ejercicios por lados (zancadas, plancha lateral) son por cada lado.`));
+
+			if (!lista.length) cont.append(el('div', { class: 'vacio' }, 'Rutina vacía. Añade ejercicios.'));
+
+			lista.forEach((item, i) => {
+				const b = EJ[item.id];
+				const valor = estado.tiempos[b.id];
+				const resumen = b.tipo === 'iso' ? `${valor} s` : `${valor} reps`;
+
+				const inputSeries = el('input', {
+					type: 'number', min: '1', max: '20', class: 'input-tiempo', value: String(item.series),
+					onchange: function () {
+						item.series = Math.max(1, Math.min(20, parseInt(this.value) || 1));
+						this.value = item.series;
+						guardar();
+					}
+				});
+				const ctrl = el('div', { class: 'rut-ctrl' },
+					el('label', {}, b.unilateral ? 'series/lado' : 'series', inputSeries));
+
+				if (b.tipo === 'fuerza') {
+					ctrl.append(el('label', {}, 'peso', el('input', {
+						type: 'text', class: 'input-tiempo input-peso', value: pesoDe(item),
+						onchange: function () {
+							const v = this.value.trim();
+							if (v === '' || v === b.peso) { delete item.peso; this.value = b.peso; }
+							else item.peso = v;
+							guardar();
+						}
+					})));
+				}
+
+				ctrl.append(
+					el('span', { class: 'espacio' }),
+					el('button', { class: 'btn-ico', disabled: i === 0, title: 'Subir',
+						onclick: () => { [lista[i - 1], lista[i]] = [lista[i], lista[i - 1]]; guardar(); pintarAjustes(); } }, '↑'),
+					el('button', { class: 'btn-ico', disabled: i === lista.length - 1, title: 'Bajar',
+						onclick: () => { [lista[i + 1], lista[i]] = [lista[i], lista[i + 1]]; guardar(); pintarAjustes(); } }, '↓'),
+					el('button', { class: 'btn-ico', title: 'Cambiar por otro ejercicio',
+						onclick: () => abrirSelector('Cambiar por…', id => {
+							item.id = id;
+							delete item.peso; // el peso vuelve al valor por defecto del nuevo ejercicio
+							guardar(); pintarAjustes();
+						}) }, '⇄'),
+					el('button', { class: 'btn-ico', title: 'Quitar',
+						onclick: () => { lista.splice(i, 1); guardar(); pintarAjustes(); } }, '🗑')
+				);
+
+				cont.append(el('div', { class: 'rut-fila' },
+					el('div', { class: 'rut-sup' },
+						imgEj(b, 'mini'),
+						el('div', { class: 'rut-nombre' }, b.nombre, el('small', {}, resumen))),
+					ctrl));
+			});
+
+			cont.append(
+				el('button', { class: 'btn-sec', onclick: () => abrirSelector('Añadir a ' + NOMBRES[ajusteDia], id => {
+					estado.rutinas[ajusteDia].push({ id, series: 1 });
+					guardar(); pintarAjustes();
+					const p = document.getElementById('pantalla-ajustes');
+					p.scrollTop = p.scrollHeight;
+				}) }, '+ Añadir ejercicio'),
+				el('button', { class: 'btn-sec btn-peligro', onclick: () => {
+					if (confirm(`¿Restaurar ${NOMBRES[ajusteDia]} a la rutina original?`)) {
+						estado.rutinas[ajusteDia] = rutinasPorDefecto()[ajusteDia];
+						guardar(); pintarAjustes();
+					}
+				} }, `Restaurar ${NOMBRES[ajusteDia]} original`)
+			);
+		}
+
+		// ---------- Pestaña TIEMPOS ----------
+		function pintarTiempos(cont) {
+			cont.append(el('p', { class: 'nota' },
+				'Tiempo o repeticiones de cada ejercicio. Se aplican igual en todos los días y rutinas.'));
+			BIBLIOTECA.forEach(b => {
+				const esFuerza = b.tipo === 'fuerza';
+				const input = el('input', {
+					type: 'number', min: '1', class: 'input-tiempo', value: String(estado.tiempos[b.id]),
+					onchange: function () {
+						const v = parseInt(this.value);
+						if (v > 0) { estado.tiempos[b.id] = v; guardar(); }
+						else this.value = estado.tiempos[b.id];
+					}
+				});
+				cont.append(el('div', { class: 'fila-lib' },
+					imgEj(b, 'mini'),
+					el('span', { class: 'nombre' }, b.nombre),
+					input,
+					el('span', { class: 'unidad' }, esFuerza ? 'repeticiones' : 'segundos')));
+			});
+		}
+
+		// ---------- Pestaña COPIA ----------
+		function pintarCopia(cont) {
+			const inputArchivo = el('input', {
+				type: 'file', accept: 'application/json,.json', style: 'display:none',
+				onchange: function () { if (this.files[0]) importar(this.files[0]); this.value = ''; }
+			});
+			cont.append(
+				el('p', { class: 'nota' },
+					'Tus rutinas se guardan solo en este navegador. Si borras los datos del sitio se pierden: guarda una copia de vez en cuando.'),
+				el('button', { class: 'btn-sec', onclick: exportar }, '⬇ Exportar copia de seguridad'),
+				el('button', { class: 'btn-sec', onclick: () => inputArchivo.click() }, '⬆ Importar copia'),
+				inputArchivo,
+				el('button', { class: 'btn-sec btn-peligro', onclick: () => {
+					if (confirm('¿Restablecer TODAS las rutinas y tiempos a los valores originales?')) {
+						estado = estadoPorDefecto();
+						guardar(); pintarAjustes();
+					}
+				} }, 'Restablecer todo a original')
+			);
+		}
+
+		function exportar() {
+			const datos = Object.assign({ app: 'Isometrix2', version: 2 }, estado);
+			const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
+			const a = document.createElement('a');
+			a.href = URL.createObjectURL(blob);
+			a.download = 'isometrix2-copia.json';
+			document.body.appendChild(a);
+			a.click();
+			a.remove();
+			setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+		}
+
+		function importar(archivo) {
+			const lector = new FileReader();
+			lector.onload = () => {
+				try {
+					const e = JSON.parse(lector.result);
+					if (!e || (!e.rutinas && !e.tiempos)) throw new Error('formato');
+					estado = sanear(e, estadoPorDefecto());
+					guardar();
+					pintarAjustes();
+					alert('Copia importada correctamente.');
+				} catch (_) {
+					alert('El archivo no es una copia válida de Isometrix2.');
+				}
+			};
+			lector.readAsText(archivo);
+		}
+
+		/* =====================================================================
+		   SELECTOR DE EJERCICIOS (rejilla con imágenes)
+		   ===================================================================== */
+		let selCallback = null;
+		let filtroTipo = 'todos';
+
+		function normalizar(s) {
+			return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+		}
+
+		function abrirSelector(titulo, alElegir) {
+			selCallback = alElegir;
+			filtroTipo = 'todos';
+			document.getElementById('sel-titulo').innerText = titulo;
+			document.getElementById('sel-buscar').value = '';
+			document.getElementById('selector-ejercicios').style.display = 'block';
+			document.getElementById('selector-ejercicios').scrollTop = 0;
+			pintarSelector();
+		}
+
+		function cerrarSelector() {
+			document.getElementById('selector-ejercicios').style.display = 'none';
+			selCallback = null;
+		}
+
+		function filtrarSelector(f) {
+			filtroTipo = f;
+			pintarSelector();
+		}
+
+		function pintarSelector() {
+			document.querySelectorAll('.chip').forEach(c => c.classList.toggle('activa', c.dataset.f === filtroTipo));
+			const q = normalizar(document.getElementById('sel-buscar').value);
+			const grid = document.getElementById('sel-grid');
+			grid.innerHTML = '';
+
+			const resultados = BIBLIOTECA.filter(b =>
+				(filtroTipo === 'todos' || b.tipo === filtroTipo) && normalizar(b.nombre).includes(q));
+
+			if (!resultados.length) {
+				grid.append(el('div', { class: 'vacio', style: 'grid-column:1/-1' }, 'Sin resultados'));
+				return;
+			}
+
+			resultados.forEach(b => {
+				const usos = estado.rutinas[ajusteDia].filter(x => x.id === b.id).length;
+				grid.append(el('button', {
+					class: 'card-ej',
+					onclick: () => { const cb = selCallback; cerrarSelector(); if (cb) cb(b.id); }
+				},
+					imgEj(b, ''),
+					b.nombre,
+					usos ? el('em', {}, `ya en ${NOMBRES[ajusteDia]}` + (usos > 1 ? ` ×${usos}` : '')) : null));
+			});
+		}
+    </script>
+</body>
+</html>
