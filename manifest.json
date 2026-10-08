@@ -1,0 +1,28 @@
+{
+  "name": "Isometrix2",
+  "short_name": "Isometrix2",
+  "id": "/Isometrix2/",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "orientation": "portrait",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "Isometrix.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot_mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "App de Entrenamiento"
+    }
+  ]
+}
