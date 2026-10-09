@@ -25,7 +25,6 @@
             width: 100%;
             max-width: 600px;
         }
-        .cronometro { font-size: 3.5rem; font-weight: 900; margin: 15px 0; }
 
 		.btn-principal {
 			display: block;
@@ -64,11 +63,11 @@
 
 		.contenedor-img-ej {
             width: 100%;
-            height: 250px;
+            height: min(28vh, 230px);
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 15px 0;
+            margin: 10px 0;
             overflow: hidden;
             background: #1a1a1a;
             border-radius: 15px;
@@ -127,6 +126,29 @@
 		/* Recuadro de respaldo cuando falta el archivo de imagen */
 		.sin-img { display: flex; align-items: center; justify-content: center; background: #262a33; color: #7d8590; font-weight: bold; font-size: 0.75rem; border-radius: 9px; overflow: hidden; }
 		.card-ej .sin-img { height: 100px; margin-bottom: 6px; font-size: 1.1rem; }
+
+		/* ---------- Entrenamiento: progreso y anillo ---------- */
+		.progreso { margin-bottom: 10px; text-align: left; }
+		.progreso-txt { display: flex; justify-content: space-between; font-size: 0.8rem; color: #aab0ba; margin-bottom: 6px; }
+		.barra { height: 8px; background: #2a2d35; border-radius: 6px; overflow: hidden; }
+		.barra-fill { height: 100%; width: 0; background: rgb(var(--rgb)); border-radius: 6px; transition: width 0.35s; }
+		.anillo { position: relative; width: min(54vw, 210px); aspect-ratio: 1; margin: 12px auto; }
+		.anillo svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+		.anillo circle { fill: none; stroke-width: 10; }
+		.anillo-fondo { stroke: #2a2d35; }
+		.anillo-prog { stroke: rgb(var(--rgb)); stroke-linecap: round; stroke-dasharray: 553; stroke-dashoffset: 0; }
+		.anillo.urgente .anillo-prog { stroke: #e74c3c; }
+		.anillo-centro { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+		.anillo-centro span { font-size: 3.6rem; font-weight: 900; line-height: 1; }
+		.anillo-centro small { color: #8a8f98; font-size: 0.75rem; margin-top: 4px; }
+		.siguiente { color: #8a8f98; font-size: 0.8rem; margin: 4px 0 0; }
+		#vista-entreno .btn-principal { background: rgb(var(--rgb)); }
+
+		/* ---------- Portada: sugerencia e historial ---------- */
+		.dia-card.sugerida { box-shadow: 0 0 0 2px rgba(var(--rgb), 0.85), 0 8px 24px rgba(var(--rgb), 0.28); }
+		.badge-sig { background: rgb(var(--rgb)); color: #fff; font-size: 0.62rem; font-weight: 800; padding: 3px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; letter-spacing: 0.04em; text-transform: uppercase; }
+		.dia-ultimo { font-size: 0.75rem; color: #8a8f98; margin-top: 5px; }
+		.dia-ultimo.ok { color: #2ecc71; }
 
 		/* ---------- Pantalla de ajustes ---------- */
         #pantalla-ajustes {
@@ -196,12 +218,23 @@
     <main id="portada"></main>
 
     <div id="vista-entreno" class="ejercicio-card" style="display:none">
+        <div class="progreso">
+            <div class="progreso-txt"><span id="ui-prog-txt"></span><span id="ui-prog-dia"></span></div>
+            <div class="barra"><div id="ui-prog-fill" class="barra-fill"></div></div>
+        </div>
         <div class="contenedor-img-ej">
             <img id="ui-imagen-ejercicio" src="" onerror="this.style.visibility='hidden'">
         </div>
 
-		<div id="ui-timer" class="cronometro" style="display: none;">00:00</div>
-        <p id="ui-info" style="font-weight: bold;"></p>
+		<div id="ui-timer" class="anillo" style="display: none;">
+            <svg viewBox="0 0 200 200">
+                <circle class="anillo-fondo" cx="100" cy="100" r="88"></circle>
+                <circle id="ui-anillo" class="anillo-prog" cx="100" cy="100" r="88"></circle>
+            </svg>
+            <div class="anillo-centro"><span id="ui-timer-num">0</span><small id="ui-timer-label"></small></div>
+        </div>
+        <p id="ui-info" style="font-weight: bold; margin: 8px 0 0;"></p>
+        <p id="ui-siguiente" class="siguiente"></p>
 
         <button id="btn-control" class="btn-principal" onclick="manejarAccion()" style="display: none;">EMPEZAR</button>
 
@@ -367,12 +400,12 @@
 		function estadoPorDefecto() {
 			const tiempos = {};
 			BIBLIOTECA.forEach(b => tiempos[b.id] = b.valor);
-			return { tiempos, rutinas: rutinasPorDefecto() };
+			return { tiempos, rutinas: rutinasPorDefecto(), historial: [] };
 		}
 
 		// Valida/limpia un estado (propio o importado) y rellena lo que falte
 		function sanear(e, def) {
-			const out = { tiempos: Object.assign({}, def.tiempos), rutinas: {} };
+			const out = { tiempos: Object.assign({}, def.tiempos), rutinas: {}, historial: [] };
 			if (e && e.tiempos) {
 				BIBLIOTECA.forEach(b => {
 					const v = Math.round(Number(e.tiempos[b.id]));
@@ -387,6 +420,12 @@
 					return o;
 				});
 			});
+			if (e && Array.isArray(e.historial)) {
+				out.historial = e.historial
+					.filter(h => h && DIAS.includes(h.dia) && /^\d{4}-\d{2}-\d{2}$/.test(h.fecha))
+					.map(h => ({ dia: h.dia, fecha: h.fecha, ts: Number(h.ts) || 0 }))
+					.slice(-100);
+			}
 			return out;
 		}
 
@@ -426,6 +465,40 @@
 
 		function pesoDe(item) {
 			return item.peso !== undefined ? item.peso : EJ[item.id].peso;
+		}
+
+
+		/* =====================================================================
+		   HISTORIAL
+		   ===================================================================== */
+		function fechaLocal(dt) {
+			const p = n => String(n).padStart(2, '0');
+			return `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())}`;
+		}
+		function diasDesde(fecha) {
+			const [y, m, d] = fecha.split('-').map(Number);
+			const hoy = new Date();
+			const a = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+			return Math.round((a - new Date(y, m - 1, d)) / 86400000);
+		}
+		function textoHace(n) {
+			return n <= 0 ? 'hoy' : n === 1 ? 'ayer' : `hace ${n} días`;
+		}
+		function registrarEntreno(dia) {
+			estado.historial.push({ dia, fecha: fechaLocal(new Date()), ts: Date.now() });
+			estado.historial = estado.historial.slice(-100);
+			guardar();
+		}
+		function ultimoDe(dia) {
+			for (let i = estado.historial.length - 1; i >= 0; i--) {
+				if (estado.historial[i].dia === dia) return estado.historial[i];
+			}
+			return null;
+		}
+		// Sugerencia: el día que sigue al último entrenado (1 → 2 → 3 → 1...)
+		function diaSugerido() {
+			const u = estado.historial[estado.historial.length - 1];
+			return u ? DIAS[(DIAS.indexOf(u.dia) + 1) % DIAS.length] : null;
 		}
 
 		/* =====================================================================
@@ -469,12 +542,26 @@
 
 			document.getElementById('portada').style.display = 'none';
 			document.getElementById('ui-sub').style.display = 'none';
+			document.getElementById('vista-entreno').style.setProperty('--rgb', COLORES_RGB[dia]);
 			document.getElementById('vista-entreno').style.display = 'block';
 			document.getElementById('ui-imagen-ejercicio').style.display = 'block';
 			document.getElementById('btn-control').style.display = 'block';
 			document.getElementById('fila-navegacion').style.display = 'flex';
 
 			renderizarEjercicio();
+		}
+
+		const CIRC = 2 * Math.PI * 88; // perímetro del anillo (r = 88)
+
+		function nombrePaso(p) {
+			return EJ[p.id].nombre + (p.lado ? ' ' + p.lado : '');
+		}
+
+		function resetAnillo() {
+			const a = document.getElementById('ui-anillo');
+			a.style.setProperty('transition', 'none');
+			a.style.setProperty('stroke-dashoffset', '0');
+			document.getElementById('ui-timer').classList.remove('urgente');
 		}
 
 		function renderizarEjercicio() {
@@ -487,20 +574,28 @@
 			const b = EJ[paso.id];
 			const valor = estado.tiempos[b.id];
 
-			document.getElementById('ui-nombre').innerText = b.nombre + (paso.lado ? ' ' + paso.lado : '');
+			// Progreso
+			document.getElementById('ui-prog-txt').innerText = `Ejercicio ${ejercicioIdx + 1} de ${plan.length}`;
+			document.getElementById('ui-prog-dia').innerText = NOMBRES[diaActual];
+			document.getElementById('ui-prog-fill').style.width = ((ejercicioIdx + 1) / plan.length * 100) + '%';
+			const sig = plan[ejercicioIdx + 1];
+			document.getElementById('ui-siguiente').innerText = sig ? 'Siguiente: ' + nombrePaso(sig) : 'Último ejercicio';
+
+			document.getElementById('ui-nombre').innerText = nombrePaso(paso);
 			document.getElementById('ui-imagen-ejercicio').style.visibility = 'visible';
 			document.getElementById('ui-imagen-ejercicio').src = b.img;
 
-			let info = b.tipo === 'fuerza' ? `Peso: ${paso.peso} | Reps: ${valor}` : `Tiempo: ${valor}s`;
-			if (paso.total > 1) info += ` | Serie ${paso.serie}/${paso.total}`;
-			document.getElementById('ui-info').innerText = info;
+			const partes = [];
+			if (b.tipo === 'fuerza') partes.push(`Peso: ${paso.peso}`);
+			if (paso.total > 1) partes.push(`Serie ${paso.serie}/${paso.total}`);
+			document.getElementById('ui-info').innerText = partes.join(' | ');
 
-			if (b.tipo === 'iso') {
-				document.getElementById('ui-timer').style.display = 'block';
-				document.getElementById('ui-timer').innerText = valor;
-			} else {
-				document.getElementById('ui-timer').style.display = 'none';
-			}
+			// Anillo: en isométricos se vacía con el tiempo; en fuerza queda lleno con las repeticiones
+			resetAnillo();
+			document.getElementById('ui-timer').style.display = 'block';
+			document.getElementById('ui-timer-num').innerText = valor;
+			document.getElementById('ui-timer-label').innerText = b.tipo === 'iso' ? 'segundos' : 'repeticiones';
+
 			document.getElementById('btn-control').style.display = 'block';
 			document.getElementById('btn-control').innerText = 'EMPEZAR';
 
@@ -527,13 +622,22 @@
 			if (b.tipo === 'iso') {
 				document.getElementById('btn-control').style.display = 'none';
 				let t = estado.tiempos[b.id];
-				document.getElementById('ui-timer').innerText = t;
+				const num = document.getElementById('ui-timer-num');
+				num.innerText = t;
+
+				// El anillo se vacía de forma continua durante todo el tiempo del ejercicio
+				const anillo = document.getElementById('ui-anillo');
+				resetAnillo();
+				void anillo.getBoundingClientRect(); // fuerza al navegador a registrar el estado inicial
+				anillo.style.setProperty('transition', `stroke-dashoffset ${t}s linear`);
+				anillo.style.setProperty('stroke-dashoffset', String(CIRC));
 
 				intervalActual = setInterval(() => {
 					t--;
-					document.getElementById('ui-timer').innerText = t;
+					num.innerText = t;
 
 					if (t > 0 && t <= 5) {
+						document.getElementById('ui-timer').classList.add('urgente');
 						emitirPitido();
 					}
 
@@ -582,11 +686,15 @@
 				renderizarEjercicio();
 			} else {
 				terminado = true;
+				registrarEntreno(diaActual);
 				document.getElementById('ui-nombre').innerText = "¡Completado!";
 				document.getElementById('ui-imagen-ejercicio').style.visibility = 'visible';
 				document.getElementById('ui-imagen-ejercicio').src = "trofeo.png";
+				document.getElementById('ui-prog-txt').innerText = 'Rutina completada';
+				document.getElementById('ui-prog-fill').style.width = '100%';
 				document.getElementById('ui-timer').style.display = 'none';
-				document.getElementById('ui-info').innerText = '';
+				document.getElementById('ui-siguiente').innerText = '';
+				document.getElementById('ui-info').innerText = `${NOMBRES[diaActual]} guardado en tu historial ✓`;
 				document.getElementById('btn-control').innerText = "VOLVER AL INICIO";
 				document.getElementById('btn-control').style.display = 'block';
 				document.getElementById('btn-control').onclick = () => location.reload();
@@ -777,16 +885,24 @@
 			});
 			cont.append(
 				el('p', { class: 'nota' },
-					'Tus rutinas se guardan solo en este navegador. Si borras los datos del sitio se pierden: guarda una copia de vez en cuando.'),
+					'Tus rutinas y tu historial se guardan solo en este navegador. Si borras los datos del sitio se pierden: guarda una copia de vez en cuando.'),
 				el('button', { class: 'btn-sec', onclick: exportar }, '⬇ Exportar copia de seguridad'),
 				el('button', { class: 'btn-sec', onclick: () => inputArchivo.click() }, '⬆ Importar copia'),
 				inputArchivo,
 				el('button', { class: 'btn-sec btn-peligro', onclick: () => {
 					if (confirm('¿Restablecer TODAS las rutinas y tiempos a los valores originales?')) {
+						const hist = estado.historial; // el historial no se pierde al restablecer
 						estado = estadoPorDefecto();
+						estado.historial = hist;
 						guardar(); pintarAjustes();
 					}
-				} }, 'Restablecer todo a original')
+				} }, 'Restablecer rutinas y tiempos a original'),
+				el('button', { class: 'btn-sec btn-peligro', onclick: () => {
+					if (confirm(`¿Borrar el historial (${estado.historial.length} entrenamientos registrados)?`)) {
+						estado.historial = [];
+						guardar(); pintarAjustes(); pintarPortada();
+					}
+				} }, 'Borrar historial de entrenamientos')
 			);
 		}
 
@@ -811,6 +927,7 @@
 					estado = sanear(e, estadoPorDefecto());
 					guardar();
 					pintarAjustes();
+					pintarPortada();
 					alert('Copia importada correctamente.');
 				} catch (_) {
 					alert('El archivo no es una copia válida de Isometrix2.');
@@ -907,6 +1024,16 @@
 		function pintarPortada() {
 			const cont = document.getElementById('portada');
 			cont.innerHTML = '';
+			const sug = diaSugerido();
+			const ultimo = estado.historial[estado.historial.length - 1];
+			const hoyHecho = !!ultimo && diasDesde(ultimo.fecha) <= 0;
+
+			// Subtítulo
+			let sub = 'Elige una rutina para empezar';
+			if (ultimo && hoyHecho) sub = `¡Hoy ya entrenaste ${NOMBRES[ultimo.dia]}! Siguiente: ${NOMBRES[sug]}`;
+			else if (ultimo) sub = `Te toca ${NOMBRES[sug]} · último: ${NOMBRES[ultimo.dia]}, ${textoHace(diasDesde(ultimo.fecha))}`;
+			document.getElementById('ui-sub').innerText = sub;
+
 			DIAS.forEach(d => {
 				const lista = estado.rutinas[d];
 
@@ -926,18 +1053,28 @@
 						: 'Rutina vacía · edítala en ⚙️');
 				grupos.forEach(g => meta.append(el('span', { class: 'mini-chip' }, g)));
 
+				// última vez que se hizo este día
+				const u = ultimoDe(d);
+				const n = u ? diasDesde(u.fecha) : null;
+				const ultimoTxt = !u ? 'Aún sin hacer' : (n <= 0 ? '✓ Hecho hoy' : `Último: ${textoHace(n)}`);
+				const ultimoEl = el('div', { class: 'dia-ultimo' + (u && n <= 0 ? ' ok' : '') }, ultimoTxt);
+
 				const thumbs = el('div', { class: 'dia-thumbs' });
 				vistos.slice(0, MAX).forEach(id => thumbs.append(imgEj(EJ[id], '')));
 				if (vistos.length > MAX) thumbs.append(el('span', { class: 'mas' }, `+${vistos.length - MAX}`));
 
+				const esSug = sug === d;
 				cont.append(el('button', {
-					class: 'dia-card', style: `--rgb:${COLORES_RGB[d]}`,
+					class: 'dia-card' + (esSug ? ' sugerida' : ''), style: `--rgb:${COLORES_RGB[d]}`,
 					onclick: () => cargarDia(d)
 				},
 					el('div', { class: 'dia-top' },
-						el('span', { class: 'dia-titulo' }, NOMBRES[d]),
+						el('span', {},
+							el('span', { class: 'dia-titulo' }, NOMBRES[d]),
+							esSug ? el('span', { class: 'badge-sig' }, hoyHecho ? 'Siguiente' : 'Toca hoy') : null),
 						el('span', { class: 'dia-go' }, 'Empezar ›')),
 					meta,
+					ultimoEl,
 					lista.length ? thumbs : null));
 			});
 		}
