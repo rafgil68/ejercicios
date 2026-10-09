@@ -131,6 +131,7 @@
 		.btn-ico:disabled { opacity: 0.25; cursor: not-allowed; }
 		.btn-sec { display: block; width: 100%; padding: 13px; border-radius: 12px; border: 1px dashed #666; background: transparent; color: white; font-weight: bold; margin: 8px 0; cursor: pointer; }
 		.btn-peligro { border-color: #c0392b; color: #e74c3c; }
+		.sub-grupo { margin: 18px 0 8px; font-size: 0.8rem; color: #2ecc71; text-transform: uppercase; letter-spacing: 0.06em; }
 		.vacio { color: #888; text-align: center; padding: 20px 0; }
 
 		.fila-lib { display: flex; align-items: center; gap: 10px; background: #1a1a1a; padding: 8px 10px; margin-bottom: 8px; border-radius: 10px; }
@@ -145,8 +146,8 @@
 		}
 		#selector-ejercicios h2 { margin: 0 0 10px; }
 		#sel-buscar { width: 100%; box-sizing: border-box; padding: 11px; border-radius: 10px; border: 1px solid #555; background: #222; color: white; font-size: 1rem; }
-		.chips { display: flex; gap: 8px; margin: 10px 0; }
-		.chip { padding: 8px 14px; border-radius: 20px; border: none; background: #2a2a2a; color: #ccc; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+		.chips { display: flex; gap: 8px; margin: 10px 0; overflow-x: auto; padding-bottom: 4px; }
+		.chip { flex-shrink: 0; white-space: nowrap; padding: 8px 14px; border-radius: 20px; border: none; background: #2a2a2a; color: #ccc; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
 		.chip.activa { background: #fff; color: #121212; }
 		.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 12px 0; }
 		.card-ej { background: #1e1e1e; border: none; border-radius: 12px; padding: 8px; color: white; text-align: center; font-size: 0.8rem; cursor: pointer; }
@@ -170,7 +171,7 @@
 
     <div class="ejercicio-card">
         <div class="contenedor-img-ej">
-            <img id="ui-imagen-ejercicio" src="">
+            <img id="ui-imagen-ejercicio" src="" onerror="this.style.visibility='hidden'">
         </div>
 
 		<div id="ui-timer" class="cronometro" style="display: none;">00:00</div>
@@ -200,11 +201,8 @@
 	<div id="selector-ejercicios">
 		<h2 id="sel-titulo">Elegir ejercicio</h2>
 		<input id="sel-buscar" type="search" placeholder="Buscar ejercicio..." oninput="pintarSelector()">
-		<div class="chips">
-			<button class="chip" data-f="todos" onclick="filtrarSelector('todos')">Todos</button>
-			<button class="chip" data-f="iso" onclick="filtrarSelector('iso')">Isométricos</button>
-			<button class="chip" data-f="fuerza" onclick="filtrarSelector('fuerza')">Fuerza</button>
-		</div>
+		<div id="chips-grupo" class="chips"></div>
+		<div id="chips-tipo" class="chips"></div>
 		<div id="sel-grid" class="grid"></div>
 		<button class="btn-principal" style="background:#444" onclick="cerrarSelector()">CANCELAR</button>
 	</div>
@@ -246,29 +244,53 @@
 		   'unilateral': al hacer N series se alternan dcha/izda (N por lado).
 		   ===================================================================== */
 		const BIBLIOTECA = [
-			{ id: 'mov_hombro',     nombre: 'Movilidad hombros',     tipo: 'iso',    valor: 30, img: 'mov_hombro.png' },
-			{ id: 'mov_espalda',    nombre: 'Movilidad espalda',     tipo: 'iso',    valor: 45, img: 'mov_espalda.png' },
-			{ id: 'cadera',         nombre: 'Rotaciones cadera',     tipo: 'iso',    valor: 30, img: 'cadera.png' },
-			{ id: 'sentadilla_sin', nombre: 'Sentadilla sin peso',   tipo: 'iso',    valor: 30, img: 'sentadilla_sin.png' },
-			{ id: 'buenos_dias',    nombre: 'Buenos días',           tipo: 'iso',    valor: 45, img: 'Buenos_dias.png' },
-			{ id: 'bird_dog',       nombre: 'Bird dog',              tipo: 'iso',    valor: 45, img: 'bird_dog.png' },
-			{ id: 'esfinge',        nombre: 'Esfinge',               tipo: 'iso',    valor: 30, img: 'esfinge.jpg' },
-			{ id: 'puente',         nombre: 'Puente Glúteo Iso',     tipo: 'iso',    valor: 60, img: 'puente.png' },
-			{ id: 'plancha',        nombre: 'Plancha Abdominal',     tipo: 'iso',    valor: 60, img: 'plancha.jpg' },
-			{ id: 'plancha_lat',    nombre: 'Plancha lateral',       tipo: 'iso',    valor: 45, img: 'plancha_lat.jpg', unilateral: true },
-			{ id: 'zancada',        nombre: 'Zancadas',              tipo: 'iso',    valor: 45, img: 'zancada.png',     unilateral: true },
-			{ id: 'sentadilla',     nombre: 'Sentadilla Isométrica', tipo: 'iso',    valor: 45, img: 'sentadilla.jpg' },
-			{ id: 'flexion',        nombre: 'Flexión isométrica',    tipo: 'iso',    valor: 45, img: 'flexion.jpg' },
-			{ id: 'hollow',         nombre: 'Hollow Hold',           tipo: 'iso',    valor: 45, img: 'hollow.png' },
-			{ id: 'farmer',         nombre: 'Farmer Carry estático', tipo: 'iso',    valor: 45, img: 'farmer.png' },
-			{ id: 'goblet',         nombre: 'Sentadilla Goblet',     tipo: 'fuerza', valor: 12, peso: '20kg', img: 'goblet.png' },
-			{ id: 'press_pecho',    nombre: 'Press Pecho',           tipo: 'fuerza', valor: 12, peso: '20kg', img: 'Press.png' },
-			{ id: 'peso_muerto',    nombre: 'Peso Muerto Rumano',    tipo: 'fuerza', valor: 12, peso: '25kg', img: 'peso_muerto.png' },
-			{ id: 'hombro',         nombre: 'Press Militar',         tipo: 'fuerza', valor: 10, peso: '20kg', img: 'hombro.png' },
-			{ id: 'remo',           nombre: 'Remo una mano',         tipo: 'fuerza', valor: 12, peso: '15kg', img: 'remo.png' },
-			{ id: 'pajaro',         nombre: 'Pájaros mancuernas',    tipo: 'fuerza', valor: 12, peso: '15kg', img: 'pajaro.png' },
-			{ id: 'step_down',      nombre: 'Step-down controlado',  tipo: 'fuerza', valor: 12, peso: '0',    img: 'step-down.png' }
+			{ id: 'mov_hombro', nombre: 'Movilidad hombros', tipo: 'iso', valor: 30, img: 'mov_hombro.png', grupo: 'Movilidad' },
+			{ id: 'mov_espalda', nombre: 'Movilidad espalda', tipo: 'iso', valor: 45, img: 'mov_espalda.png', grupo: 'Movilidad' },
+			{ id: 'cadera', nombre: 'Rotaciones cadera', tipo: 'iso', valor: 30, img: 'cadera.png', grupo: 'Movilidad' },
+			{ id: 'sentadilla_sin', nombre: 'Sentadilla sin peso', tipo: 'iso', valor: 30, img: 'sentadilla_sin.png', grupo: 'Pierna' },
+			{ id: 'buenos_dias', nombre: 'Buenos días', tipo: 'iso', valor: 45, img: 'Buenos_dias.png', grupo: 'Espalda' },
+			{ id: 'bird_dog', nombre: 'Bird dog', tipo: 'iso', valor: 45, img: 'bird_dog.png', grupo: 'Core' },
+			{ id: 'esfinge', nombre: 'Esfinge', tipo: 'iso', valor: 30, img: 'esfinge.jpg', grupo: 'Espalda' },
+			{ id: 'puente', nombre: 'Puente Glúteo Iso', tipo: 'iso', valor: 60, img: 'puente.png', grupo: 'Pierna' },
+			{ id: 'plancha', nombre: 'Plancha Abdominal', tipo: 'iso', valor: 60, img: 'plancha.jpg', grupo: 'Core' },
+			{ id: 'plancha_lat', nombre: 'Plancha lateral', tipo: 'iso', valor: 45, img: 'plancha_lat.jpg', grupo: 'Core', unilateral: true },
+			{ id: 'zancada', nombre: 'Zancadas', tipo: 'iso', valor: 45, img: 'zancada.png', grupo: 'Pierna', unilateral: true },
+			{ id: 'sentadilla', nombre: 'Sentadilla Isométrica', tipo: 'iso', valor: 45, img: 'sentadilla.jpg', grupo: 'Pierna' },
+			{ id: 'flexion', nombre: 'Flexión isométrica', tipo: 'iso', valor: 45, img: 'flexion.jpg', grupo: 'Pecho' },
+			{ id: 'hollow', nombre: 'Hollow Hold', tipo: 'iso', valor: 45, img: 'hollow.png', grupo: 'Core' },
+			{ id: 'farmer', nombre: 'Farmer Carry estático', tipo: 'iso', valor: 45, img: 'farmer.png', grupo: 'Core' },
+			{ id: 'goblet', nombre: 'Sentadilla Goblet', tipo: 'fuerza', valor: 12, peso: '20kg', img: 'goblet.png', grupo: 'Pierna' },
+			{ id: 'press_pecho', nombre: 'Press Pecho', tipo: 'fuerza', valor: 12, peso: '20kg', img: 'Press.png', grupo: 'Pecho' },
+			{ id: 'peso_muerto', nombre: 'Peso Muerto Rumano', tipo: 'fuerza', valor: 12, peso: '25kg', img: 'peso_muerto.png', grupo: 'Pierna' },
+			{ id: 'hombro', nombre: 'Press Militar', tipo: 'fuerza', valor: 10, peso: '20kg', img: 'hombro.png', grupo: 'Hombros' },
+			{ id: 'remo', nombre: 'Remo una mano', tipo: 'fuerza', valor: 12, peso: '15kg', img: 'remo.png', grupo: 'Espalda' },
+			{ id: 'pajaro', nombre: 'Pájaros mancuernas', tipo: 'fuerza', valor: 12, peso: '15kg', img: 'pajaro.png', grupo: 'Hombros' },
+			{ id: 'step_down', nombre: 'Step-down controlado', tipo: 'fuerza', valor: 12, peso: '0', img: 'step-down.png', grupo: 'Pierna' },
+			{ id: 'sentadilla_barra', nombre: 'Sentadilla con barra', tipo: 'fuerza', valor: 10, peso: '40kg', img: 'sentadilla_barra.png', grupo: 'Pierna' },
+			{ id: 'sentadilla_frontal', nombre: 'Sentadilla frontal', tipo: 'fuerza', valor: 10, peso: '30kg', img: 'sentadilla_frontal.png', grupo: 'Pierna' },
+			{ id: 'peso_muerto_conv', nombre: 'Peso muerto convencional', tipo: 'fuerza', valor: 8, peso: '50kg', img: 'peso_muerto_convencional.png', grupo: 'Pierna' },
+			{ id: 'hip_thrust', nombre: 'Hip thrust con barra', tipo: 'fuerza', valor: 12, peso: '40kg', img: 'hip_thrust.png', grupo: 'Pierna' },
+			{ id: 'curl_femoral', nombre: 'Curl femoral con polea', tipo: 'fuerza', valor: 12, peso: '20kg', img: 'curl_femoral_polea.png', grupo: 'Pierna' },
+			{ id: 'abduccion_polea', nombre: 'Abducción de cadera con polea', tipo: 'fuerza', valor: 15, peso: '10kg', img: 'abduccion_cadera_polea.png', grupo: 'Pierna', unilateral: true },
+			{ id: 'press_banca', nombre: 'Press banca con barra', tipo: 'fuerza', valor: 10, peso: '30kg', img: 'press_banca.png', grupo: 'Pecho' },
+			{ id: 'press_inclinado', nombre: 'Press inclinado con mancuernas', tipo: 'fuerza', valor: 12, peso: '14kg', img: 'press_inclinado.png', grupo: 'Pecho' },
+			{ id: 'aperturas_polea', nombre: 'Aperturas con polea', tipo: 'fuerza', valor: 12, peso: '10kg', img: 'aperturas_polea.png', grupo: 'Pecho' },
+			{ id: 'flexiones', nombre: 'Flexiones', tipo: 'fuerza', valor: 12, peso: '0', img: 'flexiones.png', grupo: 'Pecho' },
+			{ id: 'dominadas', nombre: 'Dominadas', tipo: 'fuerza', valor: 8, peso: '0', img: 'dominadas.png', grupo: 'Espalda' },
+			{ id: 'jalon', nombre: 'Jalón al pecho', tipo: 'fuerza', valor: 12, peso: '35kg', img: 'jalon_pecho.png', grupo: 'Espalda' },
+			{ id: 'remo_barra', nombre: 'Remo con barra', tipo: 'fuerza', valor: 10, peso: '30kg', img: 'remo_barra.png', grupo: 'Espalda' },
+			{ id: 'remo_polea', nombre: 'Remo sentado en polea', tipo: 'fuerza', valor: 12, peso: '35kg', img: 'remo_polea.png', grupo: 'Espalda' },
+			{ id: 'pullover_polea', nombre: 'Pullover con polea', tipo: 'fuerza', valor: 12, peso: '15kg', img: 'pullover_polea.png', grupo: 'Espalda' },
+			{ id: 'elevaciones_lat', nombre: 'Elevaciones laterales', tipo: 'fuerza', valor: 12, peso: '6kg', img: 'elevaciones_laterales.png', grupo: 'Hombros' },
+			{ id: 'face_pull', nombre: 'Face pull', tipo: 'fuerza', valor: 15, peso: '15kg', img: 'face_pull.png', grupo: 'Hombros' },
+			{ id: 'curl_biceps', nombre: 'Curl de bíceps con barra', tipo: 'fuerza', valor: 10, peso: '20kg', img: 'curl_biceps_barra.png', grupo: 'Brazos' },
+			{ id: 'curl_martillo', nombre: 'Curl martillo', tipo: 'fuerza', valor: 12, peso: '10kg', img: 'curl_martillo.png', grupo: 'Brazos' },
+			{ id: 'triceps_polea', nombre: 'Extensión de tríceps en polea', tipo: 'fuerza', valor: 12, peso: '20kg', img: 'triceps_polea.png', grupo: 'Brazos' },
+			{ id: 'triceps_cabeza', nombre: 'Extensión de tríceps por encima de la cabeza', tipo: 'fuerza', valor: 12, peso: '15kg', img: 'triceps_sobre_cabeza.png', grupo: 'Brazos' },
+			{ id: 'rueda', nombre: 'Rueda abdominal', tipo: 'fuerza', valor: 10, peso: '0', img: 'rueda_abdominal.png', grupo: 'Core' },
+			{ id: 'pallof', nombre: 'Pallof press', tipo: 'fuerza', valor: 12, peso: '10kg', img: 'pallof_press.png', grupo: 'Core', unilateral: true }
 		];
+		const GRUPOS = ['Pierna', 'Pecho', 'Espalda', 'Hombros', 'Brazos', 'Core', 'Movilidad'];
 		const EJ = {};
 		BIBLIOTECA.forEach(b => EJ[b.id] = b);
 
@@ -438,6 +460,7 @@
 			const valor = estado.tiempos[b.id];
 
 			document.getElementById('ui-nombre').innerText = b.nombre + (paso.lado ? ' ' + paso.lado : '');
+			document.getElementById('ui-imagen-ejercicio').style.visibility = 'visible';
 			document.getElementById('ui-imagen-ejercicio').src = b.img;
 
 			let info = b.tipo === 'fuerza' ? `Peso: ${paso.peso} | Reps: ${valor}` : `Tiempo: ${valor}s`;
@@ -532,6 +555,7 @@
 			} else {
 				terminado = true;
 				document.getElementById('ui-nombre').innerText = "¡Completado!";
+				document.getElementById('ui-imagen-ejercicio').style.visibility = 'visible';
 				document.getElementById('ui-imagen-ejercicio').src = "trofeo.png";
 				document.getElementById('ui-timer').style.display = 'none';
 				document.getElementById('ui-info').innerText = '';
@@ -688,21 +712,24 @@
 		function pintarTiempos(cont) {
 			cont.append(el('p', { class: 'nota' },
 				'Tiempo o repeticiones de cada ejercicio. Se aplican igual en todos los días y rutinas.'));
-			BIBLIOTECA.forEach(b => {
-				const esFuerza = b.tipo === 'fuerza';
-				const input = el('input', {
-					type: 'number', min: '1', class: 'input-tiempo', value: String(estado.tiempos[b.id]),
-					onchange: function () {
-						const v = parseInt(this.value);
-						if (v > 0) { estado.tiempos[b.id] = v; guardar(); }
-						else this.value = estado.tiempos[b.id];
-					}
+			GRUPOS.forEach(grupo => {
+				cont.append(el('h3', { class: 'sub-grupo' }, grupo));
+				BIBLIOTECA.filter(b => b.grupo === grupo).forEach(b => {
+					const esFuerza = b.tipo === 'fuerza';
+					const input = el('input', {
+						type: 'number', min: '1', class: 'input-tiempo', value: String(estado.tiempos[b.id]),
+						onchange: function () {
+							const v = parseInt(this.value);
+							if (v > 0) { estado.tiempos[b.id] = v; guardar(); }
+							else this.value = estado.tiempos[b.id];
+						}
+					});
+					cont.append(el('div', { class: 'fila-lib' },
+						imgEj(b, 'mini'),
+						el('span', { class: 'nombre' }, b.nombre),
+						input,
+						el('span', { class: 'unidad' }, esFuerza ? (b.unilateral ? 'reps/lado' : 'repeticiones') : (b.unilateral ? 's/lado' : 'segundos'))));
 				});
-				cont.append(el('div', { class: 'fila-lib' },
-					imgEj(b, 'mini'),
-					el('span', { class: 'nombre' }, b.nombre),
-					input,
-					el('span', { class: 'unidad' }, esFuerza ? 'repeticiones' : 'segundos')));
 			});
 		}
 
@@ -761,6 +788,7 @@
 		   ===================================================================== */
 		let selCallback = null;
 		let filtroTipo = 'todos';
+		let filtroGrupo = 'todos';
 
 		function normalizar(s) {
 			return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -769,6 +797,7 @@
 		function abrirSelector(titulo, alElegir) {
 			selCallback = alElegir;
 			filtroTipo = 'todos';
+			filtroGrupo = 'todos';
 			document.getElementById('sel-titulo').innerText = titulo;
 			document.getElementById('sel-buscar').value = '';
 			document.getElementById('selector-ejercicios').style.display = 'block';
@@ -781,19 +810,31 @@
 			selCallback = null;
 		}
 
-		function filtrarSelector(f) {
-			filtroTipo = f;
-			pintarSelector();
+		function pintarChips() {
+			const g = document.getElementById('chips-grupo');
+			const t = document.getElementById('chips-tipo');
+			g.innerHTML = '';
+			t.innerHTML = '';
+			[['todos', 'Todos'], ...GRUPOS.map(x => [x, x])].forEach(([v, txt]) => {
+				g.append(el('button', { class: 'chip' + (v === filtroGrupo ? ' activa' : ''),
+					onclick: () => { filtroGrupo = v; pintarSelector(); } }, txt));
+			});
+			[['todos', 'Todos'], ['iso', 'Isométricos'], ['fuerza', 'Fuerza']].forEach(([v, txt]) => {
+				t.append(el('button', { class: 'chip' + (v === filtroTipo ? ' activa' : ''),
+					onclick: () => { filtroTipo = v; pintarSelector(); } }, txt));
+			});
 		}
 
 		function pintarSelector() {
-			document.querySelectorAll('.chip').forEach(c => c.classList.toggle('activa', c.dataset.f === filtroTipo));
+			pintarChips();
 			const q = normalizar(document.getElementById('sel-buscar').value);
 			const grid = document.getElementById('sel-grid');
 			grid.innerHTML = '';
 
 			const resultados = BIBLIOTECA.filter(b =>
-				(filtroTipo === 'todos' || b.tipo === filtroTipo) && normalizar(b.nombre).includes(q));
+				(filtroGrupo === 'todos' || b.grupo === filtroGrupo) &&
+				(filtroTipo === 'todos' || b.tipo === filtroTipo) &&
+				normalizar(b.nombre).includes(q));
 
 			if (!resultados.length) {
 				grid.append(el('div', { class: 'vacio', style: 'grid-column:1/-1' }, 'Sin resultados'));

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'isometrix2-v2';
+const CACHE_NAME = 'isometrix2-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -26,7 +26,30 @@ const ASSETS = [
   './hombro.png',
   './remo.png',
   './pajaro.png',
-  './step-down.png'
+  './step-down.png',
+  './sentadilla_barra.png',
+  './sentadilla_frontal.png',
+  './peso_muerto_convencional.png',
+  './hip_thrust.png',
+  './curl_femoral_polea.png',
+  './abduccion_cadera_polea.png',
+  './press_banca.png',
+  './press_inclinado.png',
+  './aperturas_polea.png',
+  './flexiones.png',
+  './dominadas.png',
+  './jalon_pecho.png',
+  './remo_barra.png',
+  './remo_polea.png',
+  './pullover_polea.png',
+  './elevaciones_laterales.png',
+  './face_pull.png',
+  './curl_biceps_barra.png',
+  './curl_martillo.png',
+  './triceps_polea.png',
+  './triceps_sobre_cabeza.png',
+  './rueda_abdominal.png',
+  './pallof_press.png'
 ];
 
 // Se cachea cada archivo por separado: si alguno no existe, el resto se guarda igualmente
