@@ -14,6 +14,7 @@
             padding: 10px;
             text-align: center;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column; }
 
@@ -62,17 +63,10 @@
 		.btn-nav:disabled { opacity: 0.35; cursor: not-allowed; }
 
 		.contenedor-img-ej {
-            width: 100%;
-            height: min(28vh, 230px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 10px 0;
-            overflow: hidden;
-            background: #1a1a1a;
-            border-radius: 15px;
-        }
-		#ui-imagen-ejercicio { width: 100%; height: 100%; object-fit: contain; display: none; }
+			position: relative; width: 100%; flex: 1 1 auto; min-height: 200px; max-height: 560px;
+			margin: 10px 0 0; overflow: hidden; background: #1a1a1a; border-radius: 15px;
+		}
+		#ui-imagen-ejercicio { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: none; }
 
 		/* Botón de Ajustes (Arriba a la derecha) */
         .btn-config {
@@ -132,17 +126,26 @@
 		.progreso-txt { display: flex; justify-content: space-between; font-size: 0.8rem; color: #aab0ba; margin-bottom: 6px; }
 		.barra { height: 8px; background: #2a2d35; border-radius: 6px; overflow: hidden; }
 		.barra-fill { height: 100%; width: 0; background: rgb(var(--rgb)); border-radius: 6px; transition: width 0.35s; }
-		.anillo { position: relative; width: min(54vw, 210px); aspect-ratio: 1; margin: 12px auto; }
+		.anillo { position: relative; width: 104px; flex-shrink: 0; aspect-ratio: 1; }
 		.anillo svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 		.anillo circle { fill: none; stroke-width: 10; }
 		.anillo-fondo { stroke: #2a2d35; }
 		.anillo-prog { stroke: rgb(var(--rgb)); stroke-linecap: round; stroke-dasharray: 553; stroke-dashoffset: 0; }
 		.anillo.urgente .anillo-prog { stroke: #e74c3c; }
 		.anillo-centro { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-		.anillo-centro span { font-size: 3.6rem; font-weight: 900; line-height: 1; }
-		.anillo-centro small { color: #8a8f98; font-size: 0.75rem; margin-top: 4px; }
-		.siguiente { color: #8a8f98; font-size: 0.8rem; margin: 4px 0 0; }
-		#vista-entreno .btn-principal { background: rgb(var(--rgb)); }
+		.anillo-centro span { font-size: 1.9rem; font-weight: 900; line-height: 1; }
+		.anillo-centro small { color: #8a8f98; font-size: 0.6rem; margin-top: 2px; }
+		.fila-reloj { display: flex; align-items: center; justify-content: center; gap: 16px; width: 100%; margin-top: 12px; }
+		.reloj-info { flex: 1; min-width: 0; text-align: left; }
+		.fila-reloj.fin .reloj-info { text-align: center; }
+		#ui-info { margin: 0; font-size: 1.05rem; font-weight: bold; white-space: pre-line; }
+		.siguiente { color: #8a8f98; font-size: 0.8rem; margin: 6px 0 0; }
+		#vista-entreno { flex: 1; flex-direction: column; padding: 12px 14px; box-sizing: border-box; }
+		#vista-entreno .progreso { width: 100%; box-sizing: border-box; }
+		#vista-entreno .fila-navegacion { width: 100%; margin: 10px auto 0; }
+		.en-entreno .saludo { margin: 10px 0 8px; }
+		.en-entreno .saludo h2 { font-size: 1.35rem; }
+		#vista-entreno .btn-principal { background: rgb(var(--rgb)); margin: 14px auto 0; }
 
 		/* ---------- Portada: sugerencia e historial ---------- */
 		.dia-card.sugerida { box-shadow: 0 0 0 2px rgba(var(--rgb), 0.85), 0 8px 24px rgba(var(--rgb), 0.28); }
@@ -226,15 +229,19 @@
             <img id="ui-imagen-ejercicio" src="" onerror="this.style.visibility='hidden'">
         </div>
 
-		<div id="ui-timer" class="anillo" style="display: none;">
-            <svg viewBox="0 0 200 200">
-                <circle class="anillo-fondo" cx="100" cy="100" r="88"></circle>
-                <circle id="ui-anillo" class="anillo-prog" cx="100" cy="100" r="88"></circle>
-            </svg>
-            <div class="anillo-centro"><span id="ui-timer-num">0</span><small id="ui-timer-label"></small></div>
+		<div class="fila-reloj">
+            <div id="ui-timer" class="anillo" style="display: none;">
+                <svg viewBox="0 0 200 200">
+                    <circle class="anillo-fondo" cx="100" cy="100" r="88"></circle>
+                    <circle id="ui-anillo" class="anillo-prog" cx="100" cy="100" r="88"></circle>
+                </svg>
+                <div class="anillo-centro"><span id="ui-timer-num">0</span><small id="ui-timer-label"></small></div>
+            </div>
+            <div class="reloj-info">
+                <p id="ui-info"></p>
+                <p id="ui-siguiente" class="siguiente"></p>
+            </div>
         </div>
-        <p id="ui-info" style="font-weight: bold; margin: 8px 0 0;"></p>
-        <p id="ui-siguiente" class="siguiente"></p>
 
         <button id="btn-control" class="btn-principal" onclick="manejarAccion()" style="display: none;">EMPEZAR</button>
 
@@ -543,7 +550,8 @@
 			document.getElementById('portada').style.display = 'none';
 			document.getElementById('ui-sub').style.display = 'none';
 			document.getElementById('vista-entreno').style.setProperty('--rgb', COLORES_RGB[dia]);
-			document.getElementById('vista-entreno').style.display = 'block';
+			document.getElementById('vista-entreno').style.display = 'flex';
+			document.body.classList.add('en-entreno');
 			document.getElementById('ui-imagen-ejercicio').style.display = 'block';
 			document.getElementById('btn-control').style.display = 'block';
 			document.getElementById('fila-navegacion').style.display = 'flex';
@@ -588,7 +596,7 @@
 			const partes = [];
 			if (b.tipo === 'fuerza') partes.push(`Peso: ${paso.peso}`);
 			if (paso.total > 1) partes.push(`Serie ${paso.serie}/${paso.total}`);
-			document.getElementById('ui-info').innerText = partes.join(' | ');
+			document.getElementById('ui-info').innerText = partes.join('\n');
 
 			// Anillo: en isométricos se vacía con el tiempo; en fuerza queda lleno con las repeticiones
 			resetAnillo();
@@ -693,6 +701,7 @@
 				document.getElementById('ui-prog-txt').innerText = 'Rutina completada';
 				document.getElementById('ui-prog-fill').style.width = '100%';
 				document.getElementById('ui-timer').style.display = 'none';
+				document.querySelector('.fila-reloj').classList.add('fin');
 				document.getElementById('ui-siguiente').innerText = '';
 				document.getElementById('ui-info').innerText = `${NOMBRES[diaActual]} guardado en tu historial ✓`;
 				document.getElementById('btn-control').innerText = "VOLVER AL INICIO";
