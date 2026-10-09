@@ -103,9 +103,10 @@
 		.saludo h2 { margin: 0; font-size: 1.6rem; }
 		.saludo p { margin: 6px 0 0; color: #8a8f98; font-size: 0.85rem; }
 
-		#portada { display: flex; flex-direction: column; gap: 14px; margin-top: auto; padding: 16px 4px 22px; width: 100%; max-width: 600px; align-self: center; box-sizing: border-box; }
+		#portada { display: flex; flex-direction: column; gap: 14px; flex: 1; padding: 14px 4px 18px; width: 100%; max-width: 600px; align-self: center; box-sizing: border-box; }
 		.dia-card {
-			display: block; width: 100%; text-align: left; border: none; color: white; cursor: pointer;
+			display: flex; flex-direction: column; justify-content: space-between; flex: 1 1 auto; max-height: 250px;
+			width: 100%; text-align: left; border: none; color: white; cursor: pointer;
 			padding: 14px 16px; border-radius: 18px; font-family: inherit;
 			background: linear-gradient(90deg, rgba(var(--rgb), 0.24), #1c1f26 72%);
 			border-left: 6px solid rgb(var(--rgb));
@@ -118,9 +119,14 @@
 		.dia-go { font-size: 0.85rem; font-weight: bold; color: rgb(var(--rgb)); }
 		.dia-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; font-size: 0.8rem; color: #aab0ba; }
 		.mini-chip { background: rgba(255, 255, 255, 0.09); color: #dfe3ea; padding: 2px 9px; border-radius: 10px; font-size: 0.7rem; }
-		.dia-thumbs { display: flex; align-items: center; gap: 6px; margin-top: 12px; }
-		.dia-thumbs img { width: 40px; height: 40px; object-fit: contain; background: #111; border-radius: 9px; }
-		.dia-thumbs .mas { font-size: 0.75rem; color: #aab0ba; margin-left: 2px; }
+		.dia-thumbs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 12px; }
+		.dia-thumbs img { width: 100%; aspect-ratio: 1; object-fit: contain; background: #111; border-radius: 9px; }
+		.dia-thumbs .sin-img { aspect-ratio: 1; }
+		.dia-thumbs .mas { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; background: rgba(255, 255, 255, 0.08); border-radius: 9px; font-size: 0.8rem; font-weight: bold; color: #aab0ba; }
+
+		/* Recuadro de respaldo cuando falta el archivo de imagen */
+		.sin-img { display: flex; align-items: center; justify-content: center; background: #262a33; color: #7d8590; font-weight: bold; font-size: 0.75rem; border-radius: 9px; overflow: hidden; }
+		.card-ej .sin-img { height: 100px; margin-bottom: 6px; font-size: 1.1rem; }
 
 		/* ---------- Pantalla de ajustes ---------- */
         #pantalla-ajustes {
@@ -604,8 +610,15 @@
 			hijos.flat().forEach(h => { if (h != null) e.append(h); });
 			return e;
 		}
+		function iniciales(nombre) {
+			const letras = nombre.split(' ').filter(w => w.length > 3).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+			return letras || nombre[0].toUpperCase();
+		}
+		// Si el archivo de imagen no carga, se muestra un recuadro con las iniciales del ejercicio
 		function imgEj(b, clase) {
-			return el('img', { class: clase, src: b.img, onerror: function () { this.style.visibility = 'hidden'; } });
+			return el('img', { class: clase, src: b.img, onerror: function () {
+				this.replaceWith(el('div', { class: (clase ? clase + ' ' : '') + 'sin-img' }, iniciales(b.nombre)));
+			} });
 		}
 
 		let ajusteTab = 'rutinas';
@@ -905,7 +918,7 @@
 				// miniaturas de ejercicios distintos
 				const vistos = [];
 				lista.forEach(it => { if (!vistos.includes(it.id)) vistos.push(it.id); });
-				const MAX = 6;
+				const MAX = vistos.length <= 6 ? 6 : 5;
 
 				const meta = el('div', { class: 'dia-meta' },
 					lista.length
