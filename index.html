@@ -8,6 +8,7 @@
     <style>
 		html { font-size: 18px; }
         body { font-family: sans-serif;
+            background: linear-gradient(180deg, #1b1f27 0%, #121212 40%) fixed;
             background-color: #121212;
             color: white;
             padding: 10px;
@@ -15,11 +16,6 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column; }
-        .selector-dia { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .btn-dia { padding: 12px 20px; border-radius: 12px; border: none; cursor: pointer; color: white; font-weight: bold; }
-        #btn-dia1 { background-color: #3498db; }
-        #btn-dia2 { background-color: #e67e22; }
-        #btn-dia3 { background-color: #27ae60; }
 
         .ejercicio-card {
             background: #1e1e1e;
@@ -81,14 +77,8 @@
 
 		/* Botón de Ajustes (Arriba a la derecha) */
         .btn-config {
-			position: fixed;
-			top: 15px;
-			right: 15px;
-			z-index: 9999;
-			background: rgba(0,0,0,0.5);
-			border: none;
-			cursor: pointer;
-			font-size: 1.6rem;
+			width: 44px; height: 44px; border-radius: 14px; border: none; cursor: pointer;
+			background: #23262d; font-size: 1.3rem; flex-shrink: 0;
 		}
 
         .input-tiempo {
@@ -103,6 +93,34 @@
 			font-weight: bold;
 		}
 		.input-peso { width: 64px; }
+
+		/* ---------- Portada ---------- */
+		.topbar { display: flex; justify-content: space-between; align-items: center; padding: 6px 4px 0; width: 100%; max-width: 600px; align-self: center; box-sizing: border-box; }
+		.marca { display: flex; align-items: center; gap: 10px; }
+		.marca h1 { margin: 0; font-size: 1.25rem; letter-spacing: 0.02em; }
+		#ui-logo { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; box-shadow: 0 0 14px rgba(93, 173, 226, 0.45); }
+		.saludo { margin: 22px 0 6px; }
+		.saludo h2 { margin: 0; font-size: 1.6rem; }
+		.saludo p { margin: 6px 0 0; color: #8a8f98; font-size: 0.85rem; }
+
+		#portada { display: flex; flex-direction: column; gap: 14px; margin-top: auto; padding: 16px 4px 22px; width: 100%; max-width: 600px; align-self: center; box-sizing: border-box; }
+		.dia-card {
+			display: block; width: 100%; text-align: left; border: none; color: white; cursor: pointer;
+			padding: 14px 16px; border-radius: 18px; font-family: inherit;
+			background: linear-gradient(90deg, rgba(var(--rgb), 0.24), #1c1f26 72%);
+			border-left: 6px solid rgb(var(--rgb));
+			box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+			transition: transform 0.12s;
+		}
+		.dia-card:active { transform: scale(0.98); }
+		.dia-top { display: flex; justify-content: space-between; align-items: baseline; }
+		.dia-titulo { font-size: 1.35rem; font-weight: 800; }
+		.dia-go { font-size: 0.85rem; font-weight: bold; color: rgb(var(--rgb)); }
+		.dia-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; font-size: 0.8rem; color: #aab0ba; }
+		.mini-chip { background: rgba(255, 255, 255, 0.09); color: #dfe3ea; padding: 2px 9px; border-radius: 10px; font-size: 0.7rem; }
+		.dia-thumbs { display: flex; align-items: center; gap: 6px; margin-top: 12px; }
+		.dia-thumbs img { width: 40px; height: 40px; object-fit: contain; background: #111; border-radius: 9px; }
+		.dia-thumbs .mas { font-size: 0.75rem; color: #aab0ba; margin-left: 2px; }
 
 		/* ---------- Pantalla de ajustes ---------- */
         #pantalla-ajustes {
@@ -156,20 +174,22 @@
 	</style>
 </head>
 <body>
-   <button class="btn-config" onclick="abrirAjustes()">⚙️</button>
-
-    <header id="cabecera">
-        <h1>Isometrix2</h1>
-		<h2 id="ui-nombre">Selecciona un día</h2>
-        <div id="contenedor-selector" class="selector-dia">
-            <button id="btn-dia1" class="btn-dia" onclick="cargarDia('dia1')">Día 1</button>
-            <button id="btn-dia2" class="btn-dia" onclick="cargarDia('dia2')">Día 2</button>
-            <button id="btn-dia3" class="btn-dia" onclick="cargarDia('dia3')">Día 3</button>
+   <header class="topbar">
+        <div class="marca">
+            <img id="ui-logo" src="Isometrix.png" alt="" onerror="this.style.display='none'">
+            <h1>Isometrix2</h1>
         </div>
-		<img id="ui-logo" src="Isometrix.png" style="width:200px; margin-top:15px;">
+        <button class="btn-config" onclick="abrirAjustes()" aria-label="Ajustes">⚙️</button>
     </header>
 
-    <div class="ejercicio-card">
+    <div class="saludo">
+        <h2 id="ui-nombre">¿Qué toca hoy?</h2>
+        <p id="ui-sub">Elige una rutina para empezar</p>
+    </div>
+
+    <main id="portada"></main>
+
+    <div id="vista-entreno" class="ejercicio-card" style="display:none">
         <div class="contenedor-img-ej">
             <img id="ui-imagen-ejercicio" src="" onerror="this.style.visibility='hidden'">
         </div>
@@ -297,6 +317,7 @@
 		const DIAS = ['dia1', 'dia2', 'dia3'];
 		const NOMBRES = { dia1: 'Día 1', dia2: 'Día 2', dia3: 'Día 3' };
 		const COLORES = { dia1: '#3498db', dia2: '#e67e22', dia3: '#27ae60' };
+		const COLORES_RGB = { dia1: '52,152,219', dia2: '230,126,34', dia3: '39,174,96' };
 
 		/* =====================================================================
 		   ESTADO (guardado en localStorage)
@@ -440,8 +461,9 @@
 			ejercicioIdx = 0;
 			terminado = false;
 
-			document.getElementById('contenedor-selector').style.display = 'none';
-			document.getElementById('ui-logo').style.display = 'none';
+			document.getElementById('portada').style.display = 'none';
+			document.getElementById('ui-sub').style.display = 'none';
+			document.getElementById('vista-entreno').style.display = 'block';
 			document.getElementById('ui-imagen-ejercicio').style.display = 'block';
 			document.getElementById('btn-control').style.display = 'block';
 			document.getElementById('fila-navegacion').style.display = 'flex';
@@ -596,6 +618,7 @@
 
 		function cerrarAjustes() {
 			document.getElementById('pantalla-ajustes').style.display = 'none';
+			pintarPortada();
 
 			// Si hay un entrenamiento en curso, lo reconstruimos con los cambios
 			if (diaActual && !terminado) {
@@ -852,6 +875,60 @@
 					usos ? el('em', {}, `ya en ${NOMBRES[ajusteDia]}` + (usos > 1 ? ` ×${usos}` : '')) : null));
 			});
 		}
+
+		/* =====================================================================
+		   PORTADA: una tarjeta por día con resumen de la rutina
+		   ===================================================================== */
+		// Estimación orientativa: isométricos = su tiempo + 5 s de transición;
+		// fuerza = ~3 s por repetición + 10 s de preparación
+		function minutosEstimados(dia) {
+			let seg = 0;
+			construirPlan(dia).forEach(p => {
+				const b = EJ[p.id];
+				const v = estado.tiempos[b.id];
+				seg += b.tipo === 'iso' ? v + 5 : v * 3 + 10;
+			});
+			return Math.max(1, Math.round(seg / 60));
+		}
+
+		function pintarPortada() {
+			const cont = document.getElementById('portada');
+			cont.innerHTML = '';
+			DIAS.forEach(d => {
+				const lista = estado.rutinas[d];
+
+				// grupos más trabajados (máx. 3)
+				const cuenta = {};
+				lista.forEach(it => { const g = EJ[it.id].grupo; cuenta[g] = (cuenta[g] || 0) + 1; });
+				const grupos = Object.keys(cuenta).sort((a, b) => cuenta[b] - cuenta[a]).slice(0, 3);
+
+				// miniaturas de ejercicios distintos
+				const vistos = [];
+				lista.forEach(it => { if (!vistos.includes(it.id)) vistos.push(it.id); });
+				const MAX = 6;
+
+				const meta = el('div', { class: 'dia-meta' },
+					lista.length
+						? `${lista.length} ejercicios · ~${minutosEstimados(d)} min`
+						: 'Rutina vacía · edítala en ⚙️');
+				grupos.forEach(g => meta.append(el('span', { class: 'mini-chip' }, g)));
+
+				const thumbs = el('div', { class: 'dia-thumbs' });
+				vistos.slice(0, MAX).forEach(id => thumbs.append(imgEj(EJ[id], '')));
+				if (vistos.length > MAX) thumbs.append(el('span', { class: 'mas' }, `+${vistos.length - MAX}`));
+
+				cont.append(el('button', {
+					class: 'dia-card', style: `--rgb:${COLORES_RGB[d]}`,
+					onclick: () => cargarDia(d)
+				},
+					el('div', { class: 'dia-top' },
+						el('span', { class: 'dia-titulo' }, NOMBRES[d]),
+						el('span', { class: 'dia-go' }, 'Empezar ›')),
+					meta,
+					lista.length ? thumbs : null));
+			});
+		}
+		pintarPortada();
     </script>
 </body>
 </html>
