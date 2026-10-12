@@ -311,16 +311,16 @@
 		   ===================================================================== */
 		const BIBLIOTECA = [
 		//calentamiento
-			{ id: 'mov_hombro', nombre: 'Movilidad hombros', tipo: 'iso', valor: 30, img: 'calentamiento/mov_hombro.png', grupo: 'Movilidad' },
-			{ id: 'mov_espalda', nombre: 'Movilidad espalda', tipo: 'iso', valor: 45, img: 'calentamiento/mov_espalda.png', grupo: 'Movilidad' },
-			{ id: 'cadera', nombre: 'Rotaciones cadera', tipo: 'iso', valor: 30, img: 'calentamiento/cadera.png', grupo: 'Movilidad' },
-			{ id: 'sentadilla_sin', nombre: 'Sentadilla sin peso', tipo: 'iso', valor: 60, img: 'calentamiento/sentadilla_sin.png', grupo: 'Pierna' },
-			{ id: 'buenos_dias', nombre: 'Buenos días', tipo: 'iso', valor: 45, img: 'calentamiento/Buenos_dias.png', grupo: 'Espalda' },
-			{ id: 'bird_dog', nombre: 'Bird dog', tipo: 'iso', valor: 45, img: 'calentamiento/bird_dog.png', grupo: 'Core' },
-			{ id: 'puente', nombre: 'Puente Glúteo Iso', tipo: 'iso', valor: 60, img: 'calentamiento/puente.png', grupo: 'Pierna' },
-			{ id: 'goblet', nombre: 'Sentadilla Goblet', tipo: 'fuerza', valor: 12, peso: '20kg', img: 'calentamiento/goblet.png', grupo: 'Pierna' },
-			{ id: 'colgado', nombre: 'Colgado activo', tipo: 'iso', valor: 15, img: 'calentamiento/colgado.png', grupo: 'Espalda' },
-			{ id: 'rotacion', nombre: 'Rotación toracica cuadrupedia', tipo: 'iso', valor: 15, img: 'calentamiento/rotacion.png', grupo: 'Core' },
+			{ id: 'mov_hombro', nombre: 'Movilidad hombros', tipo: 'calent', valor: 30, img: 'calentamiento/mov_hombro.png', grupo: 'Movilidad' },
+			{ id: 'mov_espalda', nombre: 'Movilidad espalda', tipo: 'calent', valor: 45, img: 'calentamiento/mov_espalda.png', grupo: 'Movilidad' },
+			{ id: 'cadera', nombre: 'Rotaciones cadera', tipo: 'calent', valor: 30, img: 'calentamiento/cadera.png', grupo: 'Movilidad' },
+			{ id: 'sentadilla_sin', nombre: 'Sentadilla sin peso', tipo: 'calent', valor: 60, img: 'calentamiento/sentadilla_sin.png', grupo: 'Pierna' },
+			{ id: 'buenos_dias', nombre: 'Buenos días', tipo: 'calent', valor: 45, img: 'calentamiento/Buenos_dias.png', grupo: 'Espalda' },
+			{ id: 'bird_dog', nombre: 'Bird dog', tipo: 'calent', valor: 45, img: 'calentamiento/bird_dog.png', grupo: 'Core' },
+			{ id: 'puente', nombre: 'Puente Glúteo Iso', tipo: 'calent', valor: 60, img: 'calentamiento/puente.png', grupo: 'Pierna' },
+			{ id: 'goblet', nombre: 'Sentadilla Goblet', tipo: 'calent', valor: 12, peso: '20kg', img: 'calentamiento/goblet.png', grupo: 'Pierna' },
+			{ id: 'colgado', nombre: 'Colgado activo', tipo: 'calent', valor: 15, img: 'calentamiento/colgado.png', grupo: 'Espalda' },
+			{ id: 'rotacion', nombre: 'Rotación toracica cuadrupedia', tipo: 'calent', valor: 15, img: 'calentamiento/rotacion.png', grupo: 'Core' },
 		
 		//estiramientos
 			{ id: 'cobra', nombre: 'Cobra suave', tipo: 'estirar', valor: 30, img: 'estiramientos/cobra.png', grupo: 'Core' },
@@ -1000,7 +1000,7 @@
 				g.append(el('button', { class: 'chip' + (v === filtroGrupo ? ' activa' : ''),
 					onclick: () => { filtroGrupo = v; pintarSelector(); } }, txt));
 			});
-			[['todos', 'Todos'], ['iso', 'Isométricos'], ['fuerza', 'Fuerza']].forEach(([v, txt]) => {
+			[['todos', 'Todos'], ['iso', 'Isométricos'], ['fuerza', 'Fuerza'], ['calent', 'Calentamiento'], ['estirar', 'Estiramientos']].forEach(([v, txt]) => {
 				t.append(el('button', { class: 'chip' + (v === filtroTipo ? ' activa' : ''),
 					onclick: () => { filtroTipo = v; pintarSelector(); } }, txt));
 			});
