@@ -1,4 +1,4 @@
-const CACHE_NAME = 'isometrix2-v0';
+const CACHE_NAME = 'isometrix2-v7';
 const ASSETS = [
   './',
   './index.html',
