@@ -1,4 +1,4 @@
-const CACHE_NAME = 'isometrix2-v6';
+const CACHE_NAME = 'isometrix2-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -41,7 +41,7 @@ const ASSETS = [
   './fuerza/pullover_polea.png',
   './fuerza/elevaciones_laterales.png',
   './fuerza/face_pull.png',
-  './fuerza/curl_biceps_barra.png',
+  './fuerza/curl_biceps.png',
   './fuerza/curl_martillo.png',
   './fuerza/triceps_polea.png',
   './fuerza/triceps_sobre_cabeza.png',
@@ -90,8 +90,7 @@ self.addEventListener('fetch', (event) => {
     req.mode === 'navigate' ||
     url.pathname.endsWith('.html') ||
     url.pathname.endsWith('/') ||
-    url.pathname.endsWith('manifest.json') ||
-    url.pathname.endsWith('ejercicios.json');
+    url.pathname.endsWith('manifest.json');
 
   if (esDocumento) {
     // Red primero (así las actualizaciones llegan solas); sin conexión, usa la copia guardada

@@ -163,7 +163,7 @@
 		}
 		#pantalla-ajustes h2 { margin: 0 0 10px; }
 		.tabs { display: flex; gap: 8px; margin: 10px 0 16px; }
-		.tab { flex: 1; padding: 10px 2px; border-radius: 10px; border: none; background: #2a2a2a; color: #ccc; font-weight: bold; font-size: 0.74rem; cursor: pointer; }
+		.tab { flex: 1; padding: 10px 6px; border-radius: 10px; border: none; background: #2a2a2a; color: #ccc; font-weight: bold; font-size: 0.85rem; cursor: pointer; }
 		.tab.activa { background: #fff; color: #121212; }
 		.pills { display: flex; gap: 8px; margin-bottom: 12px; }
 		.pill { flex: 1; padding: 10px; border-radius: 10px; border: 2px solid transparent; color: white; font-weight: bold; opacity: 0.5; cursor: pointer; }
@@ -188,30 +188,6 @@
 		.fila-lib { display: flex; align-items: center; gap: 10px; background: #1a1a1a; padding: 8px 10px; margin-bottom: 8px; border-radius: 10px; }
 		.fila-lib .nombre { flex: 1; font-size: 0.9rem; }
 		.fila-lib .unidad { font-size: 0.75rem; color: #888; width: 78px; }
-
-		/* ---------- Ejercicios propios ---------- */
-		.buscar { width: 100%; box-sizing: border-box; padding: 11px; border-radius: 10px; border: 1px solid #555; background: #222; color: white; font-size: 1rem; margin: 6px 0; }
-		.fila-ej { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: #1a1a1a; border: none; color: white; padding: 8px 10px; margin-bottom: 8px; border-radius: 10px; font-family: inherit; cursor: pointer; box-sizing: border-box; }
-		.fila-ej.fija { cursor: default; }
-		.fila-ej .txt { flex: 1; min-width: 0; }
-		.fila-ej .n { font-size: 0.9rem; font-weight: bold; }
-		.fila-ej .s { font-size: 0.72rem; color: #8a8f98; margin-top: 2px; }
-		.fila-ej .lapiz { color: #8a8f98; font-size: 1.1rem; }
-		.etq { font-size: 0.6rem; font-weight: 800; padding: 2px 7px; border-radius: 8px; background: #2b3a55; color: #9cc2ff; margin-left: 6px; vertical-align: middle; }
-		.etq.pend { background: #4a3a1a; color: #ffc46b; }
-		.etq.ok { background: #1d3d2a; color: #6fe0a0; }
-
-		#form-ejercicio { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10002; background: #121212; padding: 16px; overflow-y: auto; box-sizing: border-box; text-align: left; }
-		#form-ejercicio h2 { margin: 0 0 8px; }
-		.campo { margin: 12px 0; }
-		.campo label { display: block; font-size: 0.75rem; color: #999; margin-bottom: 4px; }
-		.campo input[type=text], .campo input[type=number], .campo input[type=password], .campo select { width: 100%; box-sizing: border-box; padding: 11px; border-radius: 10px; border: 1px solid #555; background: #222; color: white; font-size: 1rem; }
-		.campo.check label { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #ddd; }
-		.foto-prev { display: flex; align-items: center; justify-content: center; width: 100%; height: 180px; background: #1a1a1a; border-radius: 12px; overflow: hidden; color: #777; font-size: 0.85rem; margin-bottom: 8px; }
-		.foto-prev img { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-		#toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); max-width: 88%; background: #2b2f38; color: white; padding: 10px 16px; border-radius: 12px; font-size: 0.85rem; z-index: 10050; opacity: 0; pointer-events: none; transition: opacity 0.25s; text-align: center; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
-		#toast.ver { opacity: 1; }
 
 		/* ---------- Selector de ejercicios ---------- */
 		#selector-ejercicios {
@@ -283,17 +259,12 @@
 		<h2>Ajustes</h2>
 		<div class="tabs">
 			<button class="tab" data-tab="rutinas" onclick="irTab('rutinas')">Rutinas</button>
-			<button class="tab" data-tab="ejercicios" onclick="irTab('ejercicios')">Ejercicios</button>
 			<button class="tab" data-tab="tiempos" onclick="irTab('tiempos')">Tiempos</button>
 			<button class="tab" data-tab="copia" onclick="irTab('copia')">Copia</button>
 		</div>
 		<div id="aj-contenido"></div>
 		<button class="btn-principal" onclick="cerrarAjustes()">VOLVER</button>
 	</div>
-
-	<!-- Formulario de ejercicio propio -->
-	<div id="form-ejercicio"></div>
-	<div id="toast"></div>
 
 	<!-- Selector de ejercicios (rejilla con imágenes) -->
 	<div id="selector-ejercicios">
@@ -352,7 +323,7 @@
 		/* 'valor' = segundos (calent/iso/estirar) o repeticiones (fuerza), igual en todos los días.
 		   'unilateral': con N series se alternan dcha/izda (N por lado).
 		   'desc' (opcional): texto explicativo que se muestra durante el ejercicio. */
-		const BIBLIOTECA_BASE = [
+		const BIBLIOTECA = [
 			// ---- CALENTAMIENTO (por tiempo) · carpeta calentamiento/ ----
 			{ id: 'general', nombre: 'Calentamiento general', tipo: 'calent', valor: 120, img: 'calentamiento/general.png', grupo: 'Movilidad', desc: 'Marcha elevando rodillas, jumping jacks suaves y círculos de brazos.' },
 			{ id: 'mov_hombro', nombre: 'Movilidad hombros', tipo: 'calent', valor: 30, img: 'calentamiento/mov_hombro.png', grupo: 'Movilidad' },
@@ -392,7 +363,7 @@
 			{ id: 'pullover_polea', nombre: 'Pullover con polea', tipo: 'fuerza', valor: 12, peso: '15kg', img: 'fuerza/pullover_polea.png', grupo: 'Espalda' },
 			{ id: 'elevaciones_lat', nombre: 'Elevaciones laterales', tipo: 'fuerza', valor: 12, peso: '6kg', img: 'fuerza/elevaciones_laterales.png', grupo: 'Hombros' },
 			{ id: 'face_pull', nombre: 'Face pull', tipo: 'fuerza', valor: 15, peso: '15kg', img: 'fuerza/face_pull.png', grupo: 'Hombros' },
-			{ id: 'curl_biceps', nombre: 'Curl de bíceps con barra', tipo: 'fuerza', valor: 10, peso: '20kg', img: 'fuerza/curl_biceps_barra.png', grupo: 'Brazos' },
+			{ id: 'curl_biceps', nombre: 'Curl de bíceps con barra', tipo: 'fuerza', valor: 10, peso: '20kg', img: 'fuerza/curl_biceps.png', grupo: 'Brazos' },
 			{ id: 'curl_martillo', nombre: 'Curl martillo', tipo: 'fuerza', valor: 12, peso: '10kg', img: 'fuerza/curl_martillo.png', grupo: 'Brazos' },
 			{ id: 'triceps_polea', nombre: 'Extensión de tríceps en polea', tipo: 'fuerza', valor: 12, peso: '20kg', img: 'fuerza/triceps_polea.png', grupo: 'Brazos' },
 			{ id: 'triceps_cabeza', nombre: 'Extensión de tríceps por encima de la cabeza', tipo: 'fuerza', valor: 12, peso: '15kg', img: 'fuerza/triceps_sobre_cabeza.png', grupo: 'Brazos' },
@@ -417,9 +388,9 @@
 		// Autocomprobación: ids repetidos (se ignora el segundo), tipos y grupos mal escritos
 		(function validarBiblioteca() {
 			const vistos = new Set();
-			for (let i = 0; i < BIBLIOTECA_BASE.length; i++) {
-				const b = BIBLIOTECA_BASE[i];
-				if (vistos.has(b.id)) { console.warn('Biblioteca: id repetido, se ignora ->', b.id, b.nombre); BIBLIOTECA_BASE.splice(i--, 1); continue; }
+			for (let i = 0; i < BIBLIOTECA.length; i++) {
+				const b = BIBLIOTECA[i];
+				if (vistos.has(b.id)) { console.warn('Biblioteca: id repetido, se ignora ->', b.id, b.nombre); BIBLIOTECA.splice(i--, 1); continue; }
 				vistos.add(b.id);
 				if (!TIPOS[b.tipo]) console.warn('Biblioteca: tipo desconocido en', b.id, b.tipo);
 				const g = GRUPOS.find(x => x.toLowerCase() === String(b.grupo).toLowerCase());
@@ -428,77 +399,8 @@
 			}
 		})();
 
-		const BASE_IDS = new Set(BIBLIOTECA_BASE.map(b => b.id));
-		const CARPETAS = { calent: 'calentamiento', iso: 'isometricos', fuerza: 'fuerza', estirar: 'estiramientos' };
-
-		// BIBLIOTECA = ejercicios base (en el código) + ejercicios propios (creados desde la app).
-		// Se reconstruye en el sitio, para que todas las referencias sigan siendo válidas.
-		const BIBLIOTECA = [];
 		const EJ = {};
-		function reconstruirBiblioteca(propios) {
-			BIBLIOTECA.length = 0;
-			Object.keys(EJ).forEach(k => delete EJ[k]);
-			BIBLIOTECA_BASE.concat(propios || []).forEach(b => {
-				if (EJ[b.id]) return;
-				BIBLIOTECA.push(b);
-				EJ[b.id] = b;
-			});
-		}
-		reconstruirBiblioteca([]);
-		const esPropio = b => !!b.sync;
-
-		// Ruta de imagen válida: carpeta/archivo.png|jpg|jpeg|webp|gif (sin "..", sin ñ ni espacios)
-		function limpiarRuta(r) {
-			r = String(r || '').trim();
-			if (!r || r.length > 120 || r.includes('..') || r.startsWith('/')) return '';
-			return /^(?:[\w\-]+\/)*[\w\-.]+\.(?:png|jpe?g|webp|gif)$/i.test(r) ? r : '';
-		}
-
-		// Valida un ejercicio propio (creado aquí, guardado o recibido de GitHub)
-		function limpiarEj(x, conSync) {
-			if (!x || typeof x !== 'object') return null;
-			const id = String(x.id || '');
-			if (!/^[a-z0-9_]{1,60}$/.test(id) || BASE_IDS.has(id)) return null;
-			const nombre = String(x.nombre || '').trim().slice(0, 80);
-			if (!nombre || !TIPOS[x.tipo]) return null;
-			const valor = Math.round(Number(x.valor));
-			if (!(valor > 0 && valor < 10000)) return null;
-			const o = {
-				id, nombre, tipo: x.tipo, valor,
-				grupo: GRUPOS.find(g => g.toLowerCase() === String(x.grupo).toLowerCase()) || 'Movilidad'
-			};
-			if (x.tipo === 'fuerza') o.peso = String(x.peso === undefined ? '0' : x.peso).slice(0, 12);
-			if (x.unilateral) o.unilateral = true;
-			if (typeof x.desc === 'string' && x.desc.trim()) o.desc = x.desc.trim().slice(0, 200);
-			o.img = limpiarRuta(x.img);
-			if (conSync) {
-				o.sync = x.sync === 'subido' ? 'subido' : 'local';
-				if (x.dirty) o.dirty = true;
-				if (x.fotoPendiente) o.fotoPendiente = true;
-				if (Number(x.subidoTs) > 0) o.subidoTs = Number(x.subidoTs);
-			}
-			return o;
-		}
-		function sanearCustom(arr) {
-			if (!Array.isArray(arr)) return [];
-			const vistos = new Set();
-			return arr.map(x => limpiarEj(x, true)).filter(x => x && !vistos.has(x.id) && vistos.add(x.id));
-		}
-		function limpiarListaRemota(data) {
-			const arr = Array.isArray(data) ? data : (data && Array.isArray(data.ejercicios) ? data.ejercicios : null);
-			if (!arr) throw new Error('formato');
-			const vistos = new Set();
-			return arr.map(x => limpiarEj(x, false)).filter(x => x && !vistos.has(x.id) && vistos.add(x.id));
-		}
-		// Forma que se guarda en ejercicios.json (sin los campos internos de sincronización)
-		function paraJson(c) {
-			const o = { id: c.id, nombre: c.nombre, tipo: c.tipo, grupo: c.grupo, valor: c.valor };
-			if (c.peso !== undefined) o.peso = c.peso;
-			if (c.unilateral) o.unilateral = true;
-			if (c.desc) o.desc = c.desc;
-			o.img = c.img || '';
-			return o;
-		}
+		BIBLIOTECA.forEach(b => EJ[b.id] = b);
 
 		// Ejercicios cuyo id ha cambiado: se traducen para no perder rutinas ni tiempos ya guardados
 		const MIGRACION_IDS = { peso_muerto: 'peso_muerto_rum', esfinge: 'cobra' };
@@ -548,14 +450,12 @@
 		function estadoPorDefecto() {
 			const tiempos = {};
 			BIBLIOTECA.forEach(b => tiempos[b.id] = b.valor);
-			return { tiempos, rutinas: rutinasPorDefecto(), historial: [], custom: [], borrados: [] };
+			return { tiempos, rutinas: rutinasPorDefecto(), historial: [] };
 		}
 
 		// Valida/limpia un estado (propio o importado) y rellena lo que falte
 		function sanear(e, def) {
-			const out = { tiempos: Object.assign({}, def.tiempos), rutinas: {}, historial: [], custom: sanearCustom(e && e.custom), borrados: [] };
-			if (e && Array.isArray(e.borrados)) out.borrados = e.borrados.filter(id => typeof id === 'string' && /^[a-z0-9_]{1,60}$/.test(id)).slice(-200);
-			reconstruirBiblioteca(out.custom);
+			const out = { tiempos: Object.assign({}, def.tiempos), rutinas: {}, historial: [] };
 			if (e && e.tiempos) {
 				const tOld = Object.assign({}, e.tiempos);
 				Object.keys(MIGRACION_IDS).forEach(a => {
@@ -583,7 +483,6 @@
 					.map(h => ({ dia: h.dia, fecha: h.fecha, ts: Number(h.ts) || 0 }))
 					.slice(-100);
 			}
-			BIBLIOTECA.forEach(b => { if (!(out.tiempos[b.id] > 0)) out.tiempos[b.id] = b.valor; });
 			return out;
 		}
 
@@ -729,11 +628,6 @@
 				intervalActual = null;
 			}
 
-			if (!plan[ejercicioIdx] || !EJ[plan[ejercicioIdx].id]) {
-				plan = construirPlan(diaActual);
-				if (!plan.length) { location.reload(); return; }
-				ejercicioIdx = Math.min(ejercicioIdx, plan.length - 1);
-			}
 			const paso = plan[ejercicioIdx];
 			const b = EJ[paso.id];
 			const valor = estado.tiempos[b.id];
@@ -747,8 +641,7 @@
 
 			document.getElementById('ui-nombre').innerText = nombrePaso(paso);
 			document.getElementById('ui-imagen-ejercicio').style.visibility = 'visible';
-			document.getElementById('ui-imagen-ejercicio').src = srcEj(b);
-			if (!srcEj(b)) document.getElementById('ui-imagen-ejercicio').style.visibility = 'hidden';
+			document.getElementById('ui-imagen-ejercicio').src = b.img;
 
 			document.getElementById('ui-desc').innerText = b.desc || '';
 			const partes = [];
@@ -890,51 +783,13 @@
 			const letras = nombre.split(' ').filter(w => w.length > 3).slice(0, 2).map(w => w[0].toUpperCase()).join('');
 			return letras || nombre[0].toUpperCase();
 		}
-		// Fotos hechas desde la app: se guardan en el móvil (localStorage) hasta que se suben a GitHub
-		const FOTOS = {};
-		function fotoLocal(id) {
-			if (!(id in FOTOS)) { try { FOTOS[id] = localStorage.getItem('isx_img_' + id); } catch (_) { FOTOS[id] = null; } }
-			return FOTOS[id];
-		}
-		function guardarFoto(id, dataUrl) {
-			try { localStorage.setItem('isx_img_' + id, dataUrl); FOTOS[id] = dataUrl; return true; }
-			catch (_) { return false; }
-		}
-		function borrarFoto(id) {
-			try { localStorage.removeItem('isx_img_' + id); } catch (_) {}
-			FOTOS[id] = null;
-		}
-		function srcEj(b) { return fotoLocal(b.id) || b.img || ''; }
-
-		// Reduce la foto a 640 px y la convierte a JPEG (≈ 40-60 KB)
-		function procesarFoto(file) {
-			return new Promise((resolve, reject) => {
-				const url = URL.createObjectURL(file);
-				const im = new Image();
-				im.onload = () => {
-					const k = Math.min(1, 640 / Math.max(im.width, im.height));
-					const w = Math.max(1, Math.round(im.width * k)), h = Math.max(1, Math.round(im.height * k));
-					const c = document.createElement('canvas');
-					c.width = w; c.height = h;
-					const ctx = c.getContext('2d');
-					ctx.fillStyle = '#fff';
-					ctx.fillRect(0, 0, w, h);
-					ctx.drawImage(im, 0, 0, w, h);
-					URL.revokeObjectURL(url);
-					resolve(c.toDataURL('image/jpeg', 0.78));
-				};
-				im.onerror = () => { URL.revokeObjectURL(url); reject(new Error('No se pudo leer esa imagen.')); };
-				im.src = url;
-			});
-		}
-
-		// Si falta la imagen (o no carga), se muestra un recuadro con las iniciales del ejercicio
+		// Si el archivo de imagen no carga, se muestra un recuadro con las iniciales del ejercicio
 		function imgEj(b, clase) {
-			const src = srcEj(b);
-			const ph = () => el('div', { class: (clase ? clase + ' ' : '') + 'sin-img' }, iniciales(b.nombre));
-			if (!src) return ph();
-			return el('img', { class: clase, src, onerror: function () { this.replaceWith(ph()); } });
+			return el('img', { class: clase, src: b.img, onerror: function () {
+				this.replaceWith(el('div', { class: (clase ? clase + ' ' : '') + 'sin-img' }, iniciales(b.nombre)));
+			} });
 		}
+
 		let ajusteTab = 'rutinas';
 		let ajusteDia = 'dia1';
 
@@ -968,7 +823,6 @@
 			const cont = document.getElementById('aj-contenido');
 			cont.innerHTML = '';
 			if (ajusteTab === 'rutinas') pintarRutinas(cont);
-			else if (ajusteTab === 'ejercicios') pintarEjercicios(cont);
 			else if (ajusteTab === 'tiempos') pintarTiempos(cont);
 			else pintarCopia(cont);
 		}
@@ -1102,10 +956,9 @@
 				inputArchivo,
 				el('button', { class: 'btn-sec btn-peligro', onclick: () => {
 					if (confirm('¿Restablecer TODAS las rutinas y tiempos a los valores originales?')) {
-						const hist = estado.historial, cust = estado.custom, borr = estado.borrados; // no se pierden al restablecer
+						const hist = estado.historial; // el historial no se pierde al restablecer
 						estado = estadoPorDefecto();
-						estado.historial = hist; estado.custom = cust; estado.borrados = borr;
-						BIBLIOTECA.forEach(b => { if (!(estado.tiempos[b.id] > 0)) estado.tiempos[b.id] = b.valor; });
+						estado.historial = hist;
 						guardar(); pintarAjustes();
 					}
 				} }, 'Restablecer rutinas y tiempos a original'),
@@ -1116,14 +969,10 @@
 					}
 				} }, 'Borrar historial de entrenamientos')
 			);
-			pintarGitHub(cont);
 		}
 
 		function exportar() {
-			const datos = Object.assign({ app: 'Isometrix2', version: 3 }, estado);
-			const fotos = {};
-			estado.custom.forEach(c => { const f = fotoLocal(c.id); if (f) fotos[c.id] = f; });
-			if (Object.keys(fotos).length) datos.fotos = fotos;
+			const datos = Object.assign({ app: 'Isometrix2', version: 2 }, estado);
 			const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
 			const a = document.createElement('a');
 			a.href = URL.createObjectURL(blob);
@@ -1141,15 +990,6 @@
 					const e = JSON.parse(lector.result);
 					if (!e || (!e.rutinas && !e.tiempos)) throw new Error('formato');
 					estado = sanear(e, estadoPorDefecto());
-					// lo importado se considera pendiente de subir; se recuperan también las fotos guardadas en la copia
-					estado.custom.forEach(c => { c.sync = 'local'; delete c.dirty; });
-					estado.borrados = [];
-					if (e.fotos && typeof e.fotos === 'object') {
-						Object.keys(e.fotos).forEach(id => {
-							const d = e.fotos[id], c = estado.custom.find(x => x.id === id);
-							if (c && c.img && typeof d === 'string' && d.length < 600000 && /^data:image\/(jpeg|png|webp);base64,/.test(d) && guardarFoto(id, d)) c.fotoPendiente = true;
-						});
-					}
 					guardar();
 					pintarAjustes();
 					pintarPortada();
@@ -1303,533 +1143,7 @@
 					lista.length ? thumbs : null));
 			});
 		}
-		/* =====================================================================
-		   PESTAÑA EJERCICIOS + FORMULARIO (ejercicios propios)
-		   ===================================================================== */
-		let ejF = { q: '', grupo: 'todos', tipo: 'todos' };
-		let formFoto = null;
-
-		function usosDe(id) {
-			return DIAS.filter(d => estado.rutinas[d].some(x => x.id === id)).map(d => NOMBRES[d]);
-		}
-		function pendientesSync() {
-			return estado.custom.filter(c => c.sync !== 'subido' || c.dirty || c.fotoPendiente).length + estado.borrados.length;
-		}
-		function etiquetaSync(c) {
-			if (c.sync === 'subido' && !c.dirty && !c.fotoPendiente) return el('span', { class: 'etq ok' }, 'en GitHub');
-			return el('span', { class: 'etq pend' }, ghConfig() ? 'pendiente de subir' : 'solo en este móvil');
-		}
-
-		function pintarEjercicios(cont) {
-			cont.append(
-				el('button', { class: 'btn-sec', style: 'margin-top:0', onclick: () => abrirForm(null) }, '+ Nuevo ejercicio'),
-				el('input', { id: 'ej-buscar', type: 'search', class: 'buscar', placeholder: 'Buscar ejercicio...', value: ejF.q,
-					oninput: function () { ejF.q = this.value; pintarListaEj(); } }),
-				el('div', { id: 'ej-chips-grupo', class: 'chips' }),
-				el('div', { id: 'ej-chips-tipo', class: 'chips' }),
-				el('p', { class: 'nota', id: 'ej-resumen' }),
-				el('div', { id: 'ej-lista' })
-			);
-			pintarListaEj();
-		}
-
-		function pintarListaEj() {
-			const g = document.getElementById('ej-chips-grupo'), t = document.getElementById('ej-chips-tipo'), lista = document.getElementById('ej-lista');
-			if (!lista) return;
-			g.innerHTML = ''; t.innerHTML = ''; lista.innerHTML = '';
-			[['todos', 'Todos'], ...GRUPOS.map(x => [x, x])].forEach(([v, txt]) => g.append(el('button', {
-				class: 'chip' + (v === ejF.grupo ? ' activa' : ''), onclick: () => { ejF.grupo = v; pintarListaEj(); } }, txt)));
-			[['todos', 'Todos'], ...Object.keys(TIPOS).map(k => [k, TIPOS[k].nombre])].forEach(([v, txt]) => t.append(el('button', {
-				class: 'chip' + (v === ejF.tipo ? ' activa' : ''), onclick: () => { ejF.tipo = v; pintarListaEj(); } }, txt)));
-
-			const q = normalizar(ejF.q || '');
-			const res = BIBLIOTECA.filter(b => (ejF.grupo === 'todos' || b.grupo === ejF.grupo) &&
-				(ejF.tipo === 'todos' || b.tipo === ejF.tipo) && normalizar(b.nombre).includes(q));
-			document.getElementById('ej-resumen').innerText =
-				`${res.length} de ${BIBLIOTECA.length} ejercicios · ${BIBLIOTECA.filter(esPropio).length} propios (toca un ejercicio propio para editarlo)`;
-
-			if (!res.length) { lista.append(el('div', { class: 'vacio' }, 'Sin resultados')); return; }
-			res.forEach(b => {
-				const propio = esPropio(b);
-				const usos = usosDe(b.id);
-				const unidad = esTiempo(b) ? (b.unilateral ? 's/lado' : 's') : (b.unilateral ? 'reps/lado' : 'reps');
-				const sub = [TIPOS[b.tipo] ? TIPOS[b.tipo].nombre : b.tipo, b.grupo, `${estado.tiempos[b.id]} ${unidad}`].join(' · ');
-				lista.append(el(propio ? 'button' : 'div', { class: 'fila-ej' + (propio ? '' : ' fija'), onclick: propio ? () => abrirForm(b.id) : null },
-					imgEj(b, 'mini'),
-					el('div', { class: 'txt' },
-						el('div', { class: 'n' }, b.nombre, propio ? etiquetaSync(b) : null),
-						el('div', { class: 's' }, sub),
-						el('div', { class: 's' }, usos.length ? 'Usado en: ' + usos.join(', ') : 'Sin usar en ninguna rutina')),
-					propio ? el('span', { class: 'lapiz' }, '✎') : null));
-			});
-		}
-
-		function campo(txt, input, extra) {
-			return el('div', { class: 'campo' + (extra ? ' ' + extra : '') }, el('label', {}, txt), input);
-		}
-
-		function abrirForm(idEditar) {
-			const c = idEditar ? estado.custom.find(x => x.id === idEditar) : null;
-			formFoto = null;
-			const d = c || { nombre: '', grupo: GRUPOS[0], tipo: 'fuerza', valor: 12, peso: '0', img: '' };
-			const valor0 = c ? estado.tiempos[c.id] : d.valor;
-
-			const iNombre = el('input', { type: 'text', maxlength: '80', value: d.nombre, placeholder: 'Ej.: Fondos en paralelas' });
-			const sGrupo = el('select', {}, GRUPOS.map(g => el('option', { value: g, selected: g === d.grupo }, g)));
-			const sTipo = el('select', {}, Object.keys(TIPOS).map(k =>
-				el('option', { value: k, selected: k === d.tipo }, `${TIPOS[k].nombre} (${TIPOS[k].tiempo ? 'por tiempo' : 'por repeticiones'})`)));
-			const lblValor = el('label', {}, '');
-			const iValor = el('input', { type: 'number', min: '1', value: String(valor0) });
-			const iPeso = el('input', { type: 'text', maxlength: '12', value: d.peso !== undefined ? d.peso : '0', placeholder: 'Ej.: 20kg' });
-			const campoPeso = campo('Peso por defecto', iPeso);
-			const cUni = el('input', { type: 'checkbox', checked: !!d.unilateral });
-			const iDesc = el('input', { type: 'text', maxlength: '200', value: d.desc || '', placeholder: 'Opcional: nota que se verá durante el ejercicio' });
-			const iRuta = el('input', { type: 'text', maxlength: '120', value: d.img || '', placeholder: 'Ej.: fuerza/fondos.png' });
-
-			const actualizarTipo = () => {
-				const tiempo = TIPOS[sTipo.value].tiempo;
-				lblValor.textContent = tiempo ? 'Duración por defecto (segundos)' : 'Repeticiones por defecto';
-				campoPeso.style.display = tiempo ? 'none' : 'block';
-			};
-			sTipo.onchange = actualizarTipo;
-			actualizarTipo();
-
-			const prev = el('div', { class: 'foto-prev' });
-			const pintarPrev = () => {
-				prev.innerHTML = '';
-				const src = formFoto || (c ? srcEj(c) : '');
-				if (src) prev.append(el('img', { src }));
-				else prev.append(el('span', {}, 'Sin imagen todavía'));
-			};
-			pintarPrev();
-			const inputFoto = el('input', { type: 'file', accept: 'image/*', style: 'display:none',
-				onchange: async function () {
-					const f = this.files[0];
-					if (!f) return;
-					try { formFoto = await procesarFoto(f); pintarPrev(); }
-					catch (err) { alert(err.message || 'No se pudo procesar la foto.'); }
-					this.value = '';
-				} });
-
-			const f = document.getElementById('form-ejercicio');
-			f.innerHTML = '';
-			f.append(
-				el('h2', {}, c ? 'Editar ejercicio' : 'Nuevo ejercicio'),
-				campo('Nombre', iNombre),
-				campo('Grupo muscular', sGrupo),
-				campo('Tipo (carpeta)', sTipo),
-				el('div', { class: 'campo' }, lblValor, iValor),
-				campoPeso,
-				el('div', { class: 'campo check' }, el('label', {}, cUni, 'Se hace por cada lado (alterna dcha / izda)')),
-				campo('Descripción', iDesc),
-				el('div', { class: 'campo' }, el('label', {}, 'Imagen'), prev,
-					el('button', { class: 'btn-sec', style: 'margin:0 0 8px', onclick: () => inputFoto.click() }, '📷 Hacer o elegir foto'),
-					inputFoto,
-					el('label', { style: 'margin-top:6px' }, 'o nombre de un archivo que ya está en el repositorio'),
-					iRuta),
-				el('button', { class: 'btn-principal', style: 'margin-top:18px', onclick: () => guardarForm(c, {
-					iNombre, sGrupo, sTipo, iValor, iPeso, cUni, iDesc, iRuta }) }, 'GUARDAR'),
-				el('button', { class: 'btn-principal', style: 'background:#444;margin-top:0', onclick: cerrarForm }, 'CANCELAR'),
-				c ? el('button', { class: 'btn-sec btn-peligro', onclick: () => borrarEjercicioPropio(c) }, 'Borrar este ejercicio') : null
-			);
-			f.style.display = 'block';
-			f.scrollTop = 0;
-		}
-
-		function cerrarForm() {
-			document.getElementById('form-ejercicio').style.display = 'none';
-			formFoto = null;
-		}
-
-		function nuevoId(nombre) {
-			const base = normalizar(nombre).replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 30) || 'ejercicio';
-			let id;
-			do { id = base + '_' + Math.random().toString(36).slice(2, 6); } while (EJ[id] || estado.borrados.includes(id));
-			return id;
-		}
-
-		function guardarForm(c, f) {
-			const nombre = f.iNombre.value.trim();
-			if (!nombre) { alert('Escribe un nombre.'); return; }
-			if (BIBLIOTECA.some(b => b.id !== (c && c.id) && normalizar(b.nombre) === normalizar(nombre))) {
-				alert('Ya existe un ejercicio con ese nombre.'); return;
-			}
-			const valor = parseInt(f.iValor.value);
-			if (!(valor > 0)) { alert('La duración o las repeticiones deben ser un número mayor que 0.'); return; }
-			const typed = f.iRuta.value.trim();
-			const ruta = limpiarRuta(typed);
-			if (typed && !ruta) { alert('Nombre de archivo no válido. Usa algo como fuerza/fondos.png (sin espacios, tildes ni ñ).'); return; }
-
-			const tipo = f.sTipo.value;
-			const id = c ? c.id : nuevoId(nombre);
-			const datos = { nombre, tipo, grupo: f.sGrupo.value, valor, img: c ? c.img : '' };
-			if (tipo === 'fuerza') datos.peso = f.iPeso.value.trim() || '0';
-			if (f.cUni.checked) datos.unilateral = true;
-			if (f.iDesc.value.trim()) datos.desc = f.iDesc.value.trim();
-
-			let fotoPendiente = c ? !!c.fotoPendiente : false;
-			if (formFoto) {
-				if (!guardarFoto(id, formFoto)) { alert('No hay espacio en el móvil para guardar la foto. Prueba con otra más pequeña o borra ejercicios que ya no uses.'); return; }
-				datos.img = `${CARPETAS[tipo]}/${id}-${Date.now().toString(36)}.jpg`;
-				fotoPendiente = true;
-			} else if (!c || typed !== c.img) {
-				datos.img = ruta;           // archivo del repositorio (o ninguno)
-				if (c) { borrarFoto(id); fotoPendiente = false; }
-			}
-
-			if (c) {
-				['peso', 'unilateral', 'desc'].forEach(k => delete c[k]);
-				Object.assign(c, datos);
-				if (c.sync === 'subido') c.dirty = true;
-				if (fotoPendiente) c.fotoPendiente = true; else delete c.fotoPendiente;
-			} else {
-				const nuevo = Object.assign({ id, sync: 'local' }, datos);
-				if (fotoPendiente) nuevo.fotoPendiente = true;
-				estado.custom.push(nuevo);
-			}
-			estado.tiempos[id] = valor;
-			reconstruirBiblioteca(estado.custom);
-			guardar();
-			cerrarForm();
-			pintarAjustes();
-			pintarPortada();
-			syncAuto();
-		}
-
-		// Quita un ejercicio propio de todo el estado local
-		function quitarLocal(id) {
-			estado.custom = estado.custom.filter(x => x.id !== id);
-			DIAS.forEach(d => { estado.rutinas[d] = estado.rutinas[d].filter(x => x.id !== id); });
-			delete estado.tiempos[id];
-			borrarFoto(id);
-		}
-
-		function borrarEjercicioPropio(c) {
-			const usos = usosDe(c.id);
-			const msg = usos.length
-				? `"${c.nombre}" se usa en ${usos.join(', ')}. Se quitará de esas rutinas y se borrará. ¿Continuar?`
-				: `¿Borrar "${c.nombre}"?`;
-			if (!confirm(msg)) return;
-			const estabaSubido = c.sync === 'subido';
-			quitarLocal(c.id);
-			if (estabaSubido && !estado.borrados.includes(c.id)) estado.borrados.push(c.id);
-			reconstruirBiblioteca(estado.custom);
-			guardar();
-			cerrarForm();
-			pintarAjustes();
-			pintarPortada();
-			syncAuto();
-		}
-
-		/* =====================================================================
-		   AVISOS
-		   ===================================================================== */
-		let toastT = null;
-		function toast(msg) {
-			const t = document.getElementById('toast');
-			t.textContent = msg;
-			t.classList.add('ver');
-			clearTimeout(toastT);
-			toastT = setTimeout(() => t.classList.remove('ver'), 3500);
-		}
-
-		/* =====================================================================
-		   SINCRONIZACIÓN CON GITHUB
-		   Los ejercicios propios se guardan en ejercicios.json (raíz del repositorio) y sus fotos
-		   en la carpeta de su tipo. La app usa la API de GitHub con un token personal.
-		   ===================================================================== */
-		const GH_DEFECTO = { owner: 'rafgil68', repo: 'ejercicios', branch: 'main' };
-		const UN_DIA = 24 * 60 * 60 * 1000;
-
-		function ghConfig() {
-			try {
-				const c = JSON.parse(localStorage.getItem('isx_gh'));
-				if (c && c.token && c.owner && c.repo) return { token: c.token, owner: c.owner, repo: c.repo, branch: c.branch || 'main' };
-			} catch (_) {}
-			return null;
-		}
-		function ghInfoGet() { try { return JSON.parse(localStorage.getItem('isx_gh_info')); } catch (_) { return null; } }
-		function ghInfoSet(o) { try { localStorage.setItem('isx_gh_info', JSON.stringify(o)); } catch (_) {} }
-
-		function hace(ts) {
-			const m = Math.round((Date.now() - ts) / 60000);
-			if (m < 1) return 'ahora mismo';
-			if (m < 60) return `hace ${m} min`;
-			const h = Math.round(m / 60);
-			return h < 24 ? `hace ${h} h` : `hace ${Math.round(h / 24)} d`;
-		}
-		function ghEstadoTexto() {
-			const cfg = ghConfig();
-			if (!cfg) return 'Sin configurar: los ejercicios nuevos solo se guardan en este móvil.';
-			const pend = pendientesSync();
-			const info = ghInfoGet();
-			let t = `Conectado a ${cfg.owner}/${cfg.repo} (rama ${cfg.branch}). `;
-			t += pend ? `${pend} cambio(s) pendiente(s) de subir. ` : 'Todo sincronizado. ';
-			if (info) t += info.ok ? `Última sincronización: ${hace(info.ts)}.` : `Último intento fallido: ${info.msg}`;
-			return t;
-		}
-		function setGhEstado(texto) {
-			const p = document.getElementById('gh-msg');
-			if (p) p.textContent = texto || ghEstadoTexto();
-		}
-
-		function ghError(res) {
-			const e = new Error();
-			e.status = res.status;
-			if (res.status === 401) e.mensaje = 'El token no es válido o ha caducado.';
-			else if (res.status === 403) e.mensaje = 'GitHub rechazó la operación (¿el token tiene permiso "Contents: lectura y escritura"? ¿demasiadas peticiones seguidas?).';
-			else if (res.status === 404) e.mensaje = 'No encuentro el repositorio, o el token no tiene acceso a él.';
-			else if (res.status === 409 || res.status === 422) { e.mensaje = 'Conflicto al escribir en GitHub.'; e.conflicto = true; }
-			else e.mensaje = `Error de GitHub (${res.status}).`;
-			e.message = e.mensaje;
-			return e;
-		}
-		function ghFetch(cfg, ruta, opts) {
-			opts = opts || {};
-			return fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}${ruta}`, Object.assign({}, opts, {
-				cache: 'no-store',
-				headers: Object.assign({
-					'Accept': 'application/vnd.github+json',
-					'Authorization': 'Bearer ' + cfg.token,
-					'X-GitHub-Api-Version': '2022-11-28'
-				}, opts.headers || {})
-			}));
-		}
-		function b64utf8(str) {
-			const bytes = new TextEncoder().encode(str);
-			let bin = '';
-			bytes.forEach(b => { bin += String.fromCharCode(b); });
-			return btoa(bin);
-		}
-		function utf8b64(b64) {
-			const bin = atob(b64);
-			return new TextDecoder().decode(Uint8Array.from(bin, ch => ch.charCodeAt(0)));
-		}
-		function ghPut(cfg, ruta, base64, mensaje, sha) {
-			const body = { message: mensaje, content: base64, branch: cfg.branch };
-			if (sha) body.sha = sha;
-			return ghFetch(cfg, '/contents/' + ruta.split('/').map(encodeURIComponent).join('/'), {
-				method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-			});
-		}
-		async function ghLeerJson(cfg) {
-			const res = await ghFetch(cfg, `/contents/ejercicios.json?ref=${encodeURIComponent(cfg.branch)}`);
-			if (res.status === 404) return { sha: null, lista: [] };
-			if (!res.ok) throw ghError(res);
-			const data = await res.json();
-			try {
-				return { sha: data.sha, lista: limpiarListaRemota(JSON.parse(utf8b64(String(data.content || '').replace(/\s/g, '')))) };
-			} catch (_) {
-				const e = new Error('ejercicios.json no válido');
-				e.mensaje = 'El archivo ejercicios.json del repositorio no es válido; no lo toco para no perder datos.';
-				throw e;
-			}
-		}
-		async function probarConexion(cfg) {
-			const res = await ghFetch(cfg, '');
-			if (!res.ok) throw ghError(res);
-			const j = await res.json();
-			if (j.permissions && j.permissions.push === false) {
-				const e = new Error('solo lectura');
-				e.mensaje = 'El token solo puede leer el repositorio: necesita permiso de escritura en "Contents".';
-				throw e;
-			}
-			const rb = await ghFetch(cfg, '/branches/' + encodeURIComponent(cfg.branch));
-			if (rb.status === 404) {
-				const e = new Error('rama');
-				e.mensaje = `La rama "${cfg.branch}" no existe en el repositorio.`;
-				throw e;
-			}
-			return j;
-		}
-
-		function copiarDatos(c, r) {
-			['nombre', 'tipo', 'grupo', 'valor', 'peso', 'unilateral', 'desc', 'img'].forEach(k => delete c[k]);
-			Object.assign(c, paraJson(r));
-		}
-		function limpiarFotosViejas() {
-			const ahora = Date.now();
-			estado.custom.forEach(c => {
-				if (c.sync === 'subido' && !c.dirty && !c.fotoPendiente && c.subidoTs && ahora - c.subidoTs > UN_DIA && fotoLocal(c.id)) borrarFoto(c.id);
-			});
-		}
-
-		// Una pasada completa: leer GitHub -> mezclar con lo local -> subir fotos -> escribir ejercicios.json
-		async function sincronizarUnaVez(cfg) {
-			const { sha, lista: remoto } = await ghLeerJson(cfg);
-			const idsRemotos = new Set(remoto.map(r => r.id));
-			const ahora = Date.now();
-
-			// 1) GitHub -> local
-			remoto.forEach(r => {
-				if (estado.borrados.includes(r.id)) return;
-				const c = estado.custom.find(x => x.id === r.id);
-				if (!c) estado.custom.push(Object.assign({}, r, { sync: 'subido', subidoTs: 0 }));
-				else if (c.sync === 'subido' && !c.dirty && !c.fotoPendiente && JSON.stringify(paraJson(c)) !== JSON.stringify(paraJson(r))) copiarDatos(c, r);
-			});
-			// 2) borrados desde otro dispositivo: estaban subidos, sin cambios locales, y ya no están en GitHub.
-			//    El borrado local se aplaza si hay un entrenamiento en curso, pero NUNCA se vuelven a subir.
-			const borradosFuera = new Set(estado.custom
-				.filter(c => c.sync === 'subido' && !c.dirty && !c.fotoPendiente && !idsRemotos.has(c.id))
-				.map(c => c.id));
-			if (!diaActual) borradosFuera.forEach(id => quitarLocal(id));
-			// 3) fotos pendientes -> GitHub
-			for (const c of estado.custom.filter(x => x.fotoPendiente)) {
-				const data = fotoLocal(c.id);
-				if (!data || !c.img) { c.fotoPendiente = false; continue; }
-				const res = await ghPut(cfg, c.img, data.split(',')[1], 'Añadir imagen: ' + c.nombre);
-				if (!res.ok) {
-					const j = await res.json().catch(() => ({}));
-					if (!(res.status === 422 && /sha/i.test(j.message || ''))) throw ghError(res); // 422 "sha": ya estaba subida
-				}
-				c.fotoPendiente = false;
-				guardar();
-			}
-			// 4) ejercicios.json (solo si hay cambios)
-			const porId = (a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
-			const final = estado.custom.filter(c => !estado.borrados.includes(c.id) && !borradosFuera.has(c.id)).map(paraJson).sort(porId);
-			const hayCambios = JSON.stringify(final) !== JSON.stringify(remoto.map(paraJson).sort(porId));
-			if (hayCambios) {
-				const res = await ghPut(cfg, 'ejercicios.json', b64utf8(JSON.stringify({ version: 1, ejercicios: final }, null, 2) + '\n'), 'Actualizar ejercicios', sha);
-				if (res.status === 409 || res.status === 422) {
-					const e = new Error('conflicto');
-					e.conflicto = true;
-					e.mensaje = 'Otro dispositivo modificó los ejercicios a la vez.';
-					throw e;
-				}
-				if (!res.ok) throw ghError(res);
-			}
-			// 5) todo correcto
-			estado.custom.forEach(c => { if (c.sync !== 'subido' || c.dirty) { c.sync = 'subido'; delete c.dirty; c.subidoTs = ahora; } });
-			estado.borrados = [];
-			BIBLIOTECA_BASE.concat(estado.custom).forEach(b => { if (!(estado.tiempos[b.id] > 0)) estado.tiempos[b.id] = b.valor; });
-			limpiarFotosViejas();
-			reconstruirBiblioteca(estado.custom);
-			guardar();
-			return { subido: hayCambios };
-		}
-
-		let sincronizando = false, resincronizar = false;
-		async function sincronizar(manual) {
-			const cfg = ghConfig();
-			if (!cfg) { if (manual) toast('Primero configura el token de GitHub.'); return; }
-			if (!navigator.onLine) { setGhEstado('Sin conexión: se sincronizará cuando vuelva la red.'); if (manual) toast('Sin conexión.'); return; }
-			if (sincronizando) { resincronizar = true; return; }
-			sincronizando = true;
-			setGhEstado('Sincronizando…');
-			try {
-				let r = null;
-				for (let i = 0; i < 3; i++) {
-					try { r = await sincronizarUnaVez(cfg); break; }
-					catch (e) { if (e.conflicto && i < 2) continue; throw e; }
-				}
-				ghInfoSet({ ts: Date.now(), ok: true });
-				if (manual || (r && r.subido)) toast(r && r.subido ? '✓ Ejercicios sincronizados con GitHub' : '✓ Todo al día');
-			} catch (e) {
-				const msg = e.mensaje || 'sin conexión o error de red; queda pendiente.';
-				ghInfoSet({ ts: Date.now(), ok: false, msg });
-				toast('GitHub: ' + msg);
-			} finally {
-				sincronizando = false;
-				refrescarTrasSync();
-				if (resincronizar) { resincronizar = false; sincronizar(false); }
-			}
-		}
-		function syncAuto() { if (ghConfig()) sincronizar(false); }
-
-		function refrescarTrasSync() {
-			pintarPortada();
-			const aj = document.getElementById('pantalla-ajustes');
-			if (aj && aj.style.display === 'block' && ajusteTab === 'ejercicios') pintarListaEj();
-			setGhEstado();
-		}
-
-		// Sin token: solo lectura del ejercicios.json publicado (así otros dispositivos reciben los ejercicios)
-		async function cargarRemotoPublico() {
-			try {
-				const res = await fetch('ejercicios.json', { cache: 'no-store' });
-				if (!res.ok) return;
-				const lista = limpiarListaRemota(await res.json());
-				const ids = new Set(lista.map(r => r.id));
-				const ahora = Date.now();
-				let cambios = false;
-				lista.forEach(r => {
-					if (estado.borrados.includes(r.id)) return;
-					const c = estado.custom.find(x => x.id === r.id);
-					if (!c) { estado.custom.push(Object.assign({}, r, { sync: 'subido', subidoTs: 0 })); cambios = true; }
-					else if (c.sync === 'subido' && !c.dirty && !c.fotoPendiente && ahora - (c.subidoTs || 0) > 15 * 60000 &&
-						JSON.stringify(paraJson(c)) !== JSON.stringify(paraJson(r))) { copiarDatos(c, r); cambios = true; }
-				});
-				if (!diaActual) {
-					estado.custom.filter(c => c.sync === 'subido' && !c.dirty && !c.fotoPendiente && ahora - (c.subidoTs || 0) > 15 * 60000 && !ids.has(c.id))
-						.forEach(c => { quitarLocal(c.id); cambios = true; });
-				}
-				if (cambios) {
-					BIBLIOTECA_BASE.concat(estado.custom).forEach(b => { if (!(estado.tiempos[b.id] > 0)) estado.tiempos[b.id] = b.valor; });
-					reconstruirBiblioteca(estado.custom);
-					guardar();
-					refrescarTrasSync();
-				}
-			} catch (_) { /* sin red o archivo aún inexistente: no pasa nada */ }
-		}
-
-		function iniciarSync() {
-			limpiarFotosViejas();
-			const arrancar = () => { if (ghConfig()) sincronizar(false); else cargarRemotoPublico(); };
-			arrancar();
-			window.addEventListener('online', arrancar);
-		}
-
-		// ---------- Ajustes de GitHub (dentro de la pestaña Copia) ----------
-		function pintarGitHub(cont) {
-			const cfg = ghConfig();
-			const v = cfg || Object.assign({ token: '' }, GH_DEFECTO);
-			const attrs = { type: 'text', autocapitalize: 'off', autocomplete: 'off', spellcheck: 'false' };
-			const iOwner = el('input', Object.assign({}, attrs, { value: v.owner }));
-			const iRepo = el('input', Object.assign({}, attrs, { value: v.repo }));
-			const iRama = el('input', Object.assign({}, attrs, { value: v.branch }));
-			const iToken = el('input', { type: 'password', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false',
-				placeholder: cfg ? '(token guardado: déjalo vacío para mantenerlo)' : 'Pega aquí el token (github_pat_...)' });
-
-			cont.append(
-				el('h3', { class: 'sub-grupo' }, 'Sincronizar ejercicios con GitHub'),
-				el('p', { class: 'nota', id: 'gh-msg' }, ghEstadoTexto()),
-				campo('Usuario', iOwner), campo('Repositorio', iRepo), campo('Rama', iRama), campo('Token', iToken),
-				el('button', { class: 'btn-sec', onclick: async () => {
-					const owner = iOwner.value.trim(), repo = iRepo.value.trim(), branch = iRama.value.trim() || 'main';
-					const token = iToken.value.trim() || (cfg ? cfg.token : '');
-					if (!/^[A-Za-z0-9_.\-]+$/.test(owner) || !/^[A-Za-z0-9_.\-]+$/.test(repo) || !/^[A-Za-z0-9_.\-\/]+$/.test(branch)) {
-						alert('Usuario, repositorio o rama con caracteres no válidos.'); return;
-					}
-					if (!token) { alert('Pega primero el token.'); return; }
-					const nueva = { token, owner, repo, branch };
-					setGhEstado('Probando conexión…');
-					try {
-						await probarConexion(nueva);
-						localStorage.setItem('isx_gh', JSON.stringify(nueva));
-						iToken.value = '';
-						toast('✓ Conexión correcta');
-						setGhEstado();
-						sincronizar(true);
-					} catch (e) {
-						const msg = e.mensaje || 'No se pudo conectar. Revisa la conexión a internet.';
-						setGhEstado('✗ ' + msg);
-						alert(msg);
-					}
-				} }, 'Guardar y probar conexión'),
-				el('button', { class: 'btn-sec', onclick: () => sincronizar(true) }, '↻ Sincronizar ahora'),
-				el('button', { class: 'btn-sec btn-peligro', onclick: () => {
-					if (!confirm('¿Borrar el token de este móvil? Los ejercicios ya subidos siguen en GitHub.')) return;
-					localStorage.removeItem('isx_gh');
-					localStorage.removeItem('isx_gh_info');
-					pintarAjustes();
-				} }, 'Desconectar (borrar el token de este móvil)'),
-				el('p', { class: 'nota' }, 'El token se guarda solo en este móvil y no se incluye en las copias de seguridad.')
-			);
-		}
-
 		pintarPortada();
-		iniciarSync();
     </script>
 </body>
 </html>
