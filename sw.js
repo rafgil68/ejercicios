@@ -1,4 +1,4 @@
-const CACHE_NAME = 'isometrix2-v5';
+const CACHE_NAME = 'isometrix2-v7';
 const ASSETS = [
   './',
   './index.html',
@@ -90,7 +90,8 @@ self.addEventListener('fetch', (event) => {
     req.mode === 'navigate' ||
     url.pathname.endsWith('.html') ||
     url.pathname.endsWith('/') ||
-    url.pathname.endsWith('manifest.json');
+    url.pathname.endsWith('manifest.json') ||
+    url.pathname.endsWith('ejercicios.json');
 
   if (esDocumento) {
     // Red primero (así las actualizaciones llegan solas); sin conexión, usa la copia guardada
