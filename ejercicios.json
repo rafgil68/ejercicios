@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "ejercicios": [
+    {
+      "id": "abdominales_vghv",
+      "nombre": "Abdominales",
+      "tipo": "fuerza",
+      "grupo": "Core",
+      "valor": 15,
+      "peso": "0",
+      "img": ""
+    }
+  ]
+}
